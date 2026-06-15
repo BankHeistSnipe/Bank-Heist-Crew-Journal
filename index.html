@@ -691,6 +691,27 @@ body.readonly .abtn.primary[data-action=save]{display:none}
             <div class="chip" data-v="No">No</div>
           </div>
         </div>
+          <div class="field">
+          <div class="fl">Trade taken?</div>
+          <div class="chips" data-g="trade-taken" data-s="1">
+            <div class="chip" data-v="Yes - Long">Yes — Long</div>
+            <div class="chip" data-v="Yes - Short">Yes — Short</div>
+            <div class="chip" data-v="No Trade">No Trade</div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="fl">Outcome</div>
+          <div class="chips" data-g="trade-outcome" data-s="1">
+            <div class="chip" data-v="Win">Win</div>
+            <div class="chip" data-v="Loss">Loss</div>
+            <div class="chip" data-v="Breakeven">Breakeven</div>
+            <div class="chip" data-v="N/A">N/A</div>
+          </div>
+        </div>
+        <div class="field nf">
+          <div class="fl">Session notes</div>
+          <textarea data-g="session-notes" placeholder="Context, observations, anything worth noting..."></textarea>
+        </div>
         </div>
         <div class="attach-zone">
           <div class="attach-zone-lbl">EOD charts</div>
@@ -810,6 +831,7 @@ const PMAP=[
   ['largest-exp','Largest Expansion'],['move-dir','Direction'],
   ['retracement','Retracement'],['closing','Close Condition'],
   ['8am-hl','8 AM Was High/Low'],
+  ,['trade-taken','Trade Taken'],['trade-outcome','Outcome']
 ];
 
 const ATTACH_SECTIONS=['s0','s1','s2','s3','s4','s5','s6'];
