@@ -683,6 +683,14 @@ body.readonly .abtn.primary[data-action=save]{display:none}
             <div class="chip" data-v="Near Low">Near Low</div>
             <div class="chip" data-v="Mid-Range">Mid-Range</div>
           </div>
+          <div class="field">
+          <div class="fl">Was 8:00 AM the high or low of the session?</div>
+          <div class="chips" data-g="8am-hl" data-s="1">
+            <div class="chip" data-v="Yes - High">Yes — High</div>
+            <div class="chip" data-v="Yes - Low">Yes — Low</div>
+            <div class="chip" data-v="No">No</div>
+          </div>
+        </div>
         </div>
         <div class="attach-zone">
           <div class="attach-zone-lbl">EOD charts</div>
@@ -801,6 +809,7 @@ const PMAP=[
   ['or-confirm','OR Confirm'],['strongest-lvl','Strongest Level'],
   ['largest-exp','Largest Expansion'],['move-dir','Direction'],
   ['retracement','Retracement'],['closing','Close Condition'],
+  ['8am-hl','8 AM Was High/Low'],
 ];
 
 const ATTACH_SECTIONS=['s0','s1','s2','s3','s4','s5','s6'];
