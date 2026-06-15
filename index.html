@@ -708,6 +708,15 @@ body.readonly .abtn.primary[data-action=save]{display:none}
             <div class="chip" data-v="N/A">N/A</div>
           </div>
         </div>
+          <div class="field">
+          <div class="fl">Entry quality</div>
+          <div class="chips" data-g="entry-quality" data-s="1">
+            <div class="chip" data-v="A - Clean">A — Clean</div>
+            <div class="chip" data-v="B - Acceptable">B — Acceptable</div>
+            <div class="chip" data-v="C - Choppy">C — Choppy</div>
+            <div class="chip" data-v="No Trade">No Trade</div>
+          </div>
+        </div>
         <div class="field nf">
           <div class="fl">Session notes</div>
           <textarea data-g="session-notes" placeholder="Context, observations, anything worth noting..."></textarea>
@@ -832,6 +841,7 @@ const PMAP=[
   ['retracement','Retracement'],['closing','Close Condition'],
   ['8am-hl','8 AM Was High/Low'],
   ,['trade-taken','Trade Taken'],['trade-outcome','Outcome']
+  ,['entry-quality','Entry Quality']
 ];
 
 const ATTACH_SECTIONS=['s0','s1','s2','s3','s4','s5','s6'];
