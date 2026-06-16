@@ -233,6 +233,7 @@ body.readonly .abtn.primary[data-action=save]{display:none}
   <div class="mkt-bar" id="mkt-bar">
     <div class="mkt-tab active" data-i="0" onclick="switchMkt(0)">YM</div>
     <div class="mkt-tab" data-i="1" onclick="switchMkt(1)">NQ</div>
+    <div class="mkt-tab" data-i="2" onclick="switchMkt(2)">GC</div>
     <div class="mkt-add" onclick="addMarket()" title="Add market">+</div>
   </div>
 
@@ -812,9 +813,9 @@ const PMAP=[
 const ATTACH_SECTIONS=['s0','s1','s2','s3','s4','s5','s6'];
 const SEC_IDS=[0,1,2,3,4,5,6,'pb'];
 
-let mkts=[{name:'YM'},{name:'NQ'}];
+let mkts=[{name:'YM'},{name:'NQ'},{name:'GC'}];
 let activeMkt=0;
-let mktStates=[{__instrument:'YM'},{__instrument:'NQ'}];
+let mktStates=[{__instrument:'YM'},{__instrument:'NQ'},{__instrument:'GC'}];
 let mktAttach=[{},{}];
 let entries=[];
 
