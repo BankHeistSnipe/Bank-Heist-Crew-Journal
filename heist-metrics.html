@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Heist Metrics">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/BankHeistSnipe/Bank-Heist-Crew-Journal/main/BHC%20Logo.png">
+<title>Heist Metrics — BHC</title>
+<style>
+:root{
+  --gold:#C9A84C;--gold-dim:rgba(201,168,76,0.15);--gold-border:rgba(201,168,76,0.35);
+  --navy:#080D1A;--navy2:#0F1628;--navy3:#161E32;--navy4:#1C2540;
+  --txt:#E2D9C0;--txt2:#9A9080;--txt3:#5A5448;
+  --red:#E24B4A;--red-bg:rgba(226,75,74,0.12);
+  --amber:#EF9F27;--amber-bg:rgba(239,159,39,0.12);
+  --blue:#378ADD;--blue-bg:rgba(55,138,221,0.12);
+  --green:#97C459;--green-bg:rgba(99,153,34,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--navy);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif}
+
+/* BANNER */
+.banner{background:var(--navy);border-bottom:1px solid var(--gold);padding:env(safe-area-inset-top,0px) 16px 0 16px;display:flex;align-items:center;gap:12px;min-height:calc(64px + env(safe-area-inset-top,0px));position:sticky;top:0;z-index:200}
+.banner-logo{width:44px;height:44px;flex-shrink:0;border-radius:8px;overflow:hidden;border:1px solid var(--gold-border)}
+.banner-logo img{width:100%;height:100%;object-fit:cover}
+.banner-text{flex:1;min-width:0}
+.banner-title{font-size:15px;font-weight:700;color:var(--gold);letter-spacing:0.04em;line-height:1.1}
+.banner-sub{font-size:9px;color:var(--txt3);letter-spacing:0.12em;text-transform:uppercase;margin-top:2px}
+.banner-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.day-label{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase}
+.date-input{background:var(--navy3);border:0.5px solid var(--gold-border);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--gold);font-family:inherit;outline:none;-webkit-appearance:none;cursor:pointer;width:116px}
+.date-input::-webkit-calendar-picker-indicator{filter:invert(0.7) sepia(1) saturate(3) hue-rotate(5deg);cursor:pointer}
+
+/* SCORE PANEL — centerpiece */
+.score-panel{position:sticky;top:calc(64px + env(safe-area-inset-top,0px));z-index:150;background:var(--navy2);border-bottom:2px solid var(--gold-border)}
+.sp-hero{text-align:center;padding:12px 14px 8px;border-bottom:0.5px solid var(--gold-border);transition:background .25s}
+.sp-hero.sp-status-go{background:rgba(99,153,34,0.1)}
+.sp-hero.sp-status-standdown{background:rgba(226,75,74,0.08)}
+.sp-status-eyebrow{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:7px;color:var(--txt3)}
+.sp-go-chip{display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:20px;margin-bottom:5px;border:1px solid}
+.sp-go-chip.chip-go{background:rgba(99,153,34,0.18);border-color:#639922}
+.sp-go-chip.chip-standdown{background:rgba(226,75,74,0.12);border-color:#A32D2D}
+.sp-go-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sp-go-dot.dot-go{background:#97C459;box-shadow:0 0 6px rgba(151,196,89,0.8)}
+.sp-go-dot.dot-standdown{background:#E24B4A;box-shadow:0 0 6px rgba(226,75,74,0.8)}
+.sp-go-word{font-size:13px;font-weight:800;letter-spacing:0.1em}
+.sp-status-class{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px}
+.sp-score-row{display:flex;align-items:baseline;justify-content:center;gap:6px}
+.sp-num{font-size:48px;font-weight:700;color:var(--gold);line-height:1;letter-spacing:-2px}
+.sp-sep{font-size:24px;color:var(--txt3);font-weight:300}
+.sp-denom{font-size:24px;color:var(--txt3);font-weight:400}
+.sp-cats{display:grid;grid-template-columns:1fr;gap:0;padding:0 14px}
+.sp-cat-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid rgba(201,168,76,0.1)}
+.sp-cat-row:last-child{border-bottom:none}
+.sp-cat-name{font-size:11px;color:var(--txt3);width:88px}
+.sp-cat-stars{font-size:12px;letter-spacing:3px}
+
+/* NAV */
+.nav{display:flex;background:var(--navy2);border-bottom:1px solid var(--gold-border);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{flex-shrink:0;padding:9px 16px;font-size:11px;color:var(--txt3);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all .15s;letter-spacing:0.06em;text-transform:uppercase;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit}
+.nav-btn.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:600}
+.tab{display:none;padding:14px 14px calc(40px + env(safe-area-inset-bottom,0px))}
+.tab.active{display:block}
+
+/* CARDS */
+.card{background:var(--navy3);border:0.5px solid var(--gold-border);border-radius:12px;padding:14px;margin-bottom:12px}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.card-icon{font-size:18px;line-height:1}
+.card-name{font-size:14px;font-weight:600;color:var(--gold)}
+.card-sub{font-size:11px;color:var(--txt3);font-style:italic;margin-bottom:10px}
+
+/* TARGET VAULT SECTION */
+.vault-section{background:var(--navy3);border:0.5px solid var(--gold-border);border-radius:12px;padding:14px;margin-bottom:12px}
+.vault-section-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.vault-section-icon{font-size:18px}
+.vault-section-name{font-size:14px;font-weight:600;color:var(--gold)}
+.field-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:5px}
+.field-row{margin-bottom:11px}
+.mkt-row{display:flex;gap:8px}
+.mkt-btn{flex:1;padding:8px 0;border-radius:8px;border:1px solid var(--gold-border);font-size:13px;font-weight:600;cursor:pointer;background:var(--navy4);color:var(--txt3);transition:all .12s;letter-spacing:0.06em;font-family:inherit}
+.mkt-btn.active{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.setup-select{width:100%;border:0.5px solid var(--gold-border);border-radius:8px;padding:9px 12px;font-size:13px;background:var(--navy4);color:var(--txt);font-family:inherit;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A84C' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.setup-text-input{width:100%;border:0.5px solid var(--gold-border);border-radius:8px;padding:9px 12px;font-size:13px;background:var(--navy4);color:var(--txt);font-family:inherit;outline:none;margin-top:6px}
+.setup-text-input:focus{border-color:var(--gold)}
+.radio-row{display:flex;flex-wrap:wrap;gap:6px}
+.radio-chip{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt2);cursor:pointer;background:var(--navy4);border:0.5px solid var(--gold-border);border-radius:6px;padding:5px 10px;transition:all .12s}
+.radio-chip input{accent-color:var(--gold);cursor:pointer;width:12px;height:12px}
+.radio-chip.checked{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+
+/* PROBABILITY */
+.factors{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.factor{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt2);cursor:pointer;background:var(--navy4);border:0.5px solid var(--gold-border);border-radius:6px;padding:4px 8px;transition:all .12s}
+.factor input{accent-color:var(--gold);width:12px;height:12px;cursor:pointer}
+.factor.checked{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+
+/* STAR OPTIONS */
+.star-row{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.star-opt{display:flex;align-items:center;gap:10px;padding:8px 12px;border:0.5px solid var(--gold-border);border-radius:8px;cursor:pointer;background:var(--navy4);transition:all .12s}
+.star-opt.sel{border-color:var(--gold);background:var(--gold-dim)}
+.star-stars{color:var(--gold);font-size:13px;min-width:72px;letter-spacing:1px}
+.star-label{font-size:12px;color:var(--txt2);flex:1}
+.star-opt.sel .star-label{color:var(--txt)}
+.star-descriptor{font-size:10px;color:var(--txt3);font-style:italic;white-space:nowrap}
+.star-opt.sel .star-descriptor{color:var(--gold)}
+
+/* HEAT SLIDER */
+.heat-slider-wrap{margin-bottom:10px}
+.heat-slider{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;outline:none;cursor:pointer;background:linear-gradient(to right,#8B0000 0%,#E24B4A 25%,#EF9F27 50%,#C9A84C 75%,#639922 100%);margin-bottom:6px}
+.heat-slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--gold);border:2px solid var(--navy);cursor:pointer;box-shadow:0 0 0 2px var(--gold)}
+.heat-slider::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--gold);border:2px solid var(--navy);cursor:pointer}
+.heat-labels{display:flex;justify-content:space-between;margin-bottom:4px}
+.heat-lbl{font-size:9px;color:var(--txt3);text-align:center;width:20%;line-height:1.2}
+.heat-current{text-align:center;font-size:13px;font-weight:600;min-height:18px;transition:color .2s}
+
+/* DISTANCE */
+.dist-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.dist-group-label{font-size:11px;font-weight:600;color:var(--gold);margin-bottom:5px;letter-spacing:0.08em}
+.dist-check{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt2);margin-bottom:4px;cursor:pointer}
+.dist-check input{accent-color:var(--gold);cursor:pointer}
+
+/* NOTES */
+.notes-ta{width:100%;border:0.5px solid var(--gold-border);border-radius:8px;padding:7px 10px;font-size:12px;background:var(--navy4);color:var(--txt);font-family:inherit;resize:none;height:48px;outline:none}
+.notes-ta:focus{border-color:var(--gold)}
+
+/* EXPECTED HOLD chips — inside Efficiency card */
+.hold-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.hold-chip{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--txt2);cursor:pointer;background:var(--navy4);border:0.5px solid var(--gold-border);border-radius:8px;padding:7px 12px;transition:all .12s;font-weight:500}
+.hold-chip input{display:none}
+.hold-chip.sel{border-color:var(--gold);color:var(--gold);background:var(--gold-dim);font-weight:600}
+
+/* EXPECTED HAUL */
+.haul-card{background:var(--navy3);border:1px solid var(--gold);border-radius:12px;padding:16px;margin-bottom:12px}
+.haul-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.haul-icon{font-size:20px}
+.haul-title{font-size:15px;font-weight:700;color:var(--gold);letter-spacing:0.03em}
+.haul-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.haul-cell{background:var(--navy4);border:0.5px solid var(--gold-border);border-radius:10px;padding:12px;text-align:center}
+.haul-cell-label{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+.haul-cell-val{font-size:26px;font-weight:700;color:var(--gold);line-height:1}
+.haul-cell-unit{font-size:11px;color:var(--txt2);margin-top:3px}
+.haul-cell-sub{font-size:11px;color:var(--txt2);margin-top:3px}
+.haul-empty{text-align:center;font-size:12px;color:var(--txt3);font-style:italic;padding:8px 0}
+
+/* WEAKEST VAULT TEST */
+.weakest-vault{background:var(--navy3);border:1px solid var(--gold);border-radius:12px;padding:16px;margin-bottom:12px}
+.wv-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.wv-icon{font-size:20px}
+.wv-title{font-size:14px;font-weight:700;color:var(--gold)}
+.wv-question{font-size:13px;color:var(--txt2);margin-bottom:14px}
+.wv-radio-row{display:flex;gap:10px;margin-bottom:12px}
+.wv-radio-opt{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;border-radius:10px;border:1px solid var(--gold-border);background:var(--navy4);cursor:pointer;font-size:14px;font-weight:700;color:var(--txt3);transition:all .15s;letter-spacing:0.04em}
+.wv-radio-opt input{display:none}
+.wv-radio-opt.wv-yes-opt.sel{border-color:#639922;background:rgba(99,153,34,0.18);color:#97C459}
+.wv-radio-opt.wv-no-opt.sel{border-color:#A32D2D;background:rgba(163,45,45,0.18);color:var(--red)}
+.vault-response{border-radius:12px;padding:16px;font-weight:700;text-align:center;display:none;letter-spacing:0.02em}
+.vault-response.show{display:block}
+.vr-go{background:rgba(99,153,34,0.15);border:2px solid #639922}
+.vr-standdown{background:rgba(226,75,74,0.1);border:2px solid var(--red)}
+.vr-status-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:6px}
+.vr-status-word{font-size:36px;font-weight:800;letter-spacing:0.06em;line-height:1;margin-bottom:4px}
+.vr-status-sub{font-size:12px;font-weight:500;opacity:0.8;line-height:1.4}
+
+/* ACTIONS */
+.action-row{display:flex;gap:8px;margin-bottom:12px}
+.save-btn{flex:1;padding:13px 0;border-radius:10px;background:var(--gold);color:var(--navy);font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit;letter-spacing:0.04em}
+.save-btn:active{opacity:0.85}
+.reset-btn{padding:13px 18px;border-radius:10px;background:var(--navy4);color:var(--txt3);font-size:12px;border:0.5px solid var(--gold-border);cursor:pointer;font-family:inherit}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--gold);color:var(--navy);font-size:13px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:999;transition:all .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* HISTORY */
+.hist-empty{text-align:center;padding:40px 20px;color:var(--txt3);font-size:13px}
+.hist-card{background:var(--navy3);border:0.5px solid var(--gold-border);border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color .12s}
+.hist-card:active{border-color:var(--gold)}
+.hist-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
+.hist-day{font-size:13px;font-weight:700;color:var(--gold)}
+.hist-date{font-size:11px;color:var(--txt3)}
+.hist-setup{font-size:12px;color:var(--txt2);margin-bottom:8px;font-style:italic}
+.hist-chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.hist-mkt{font-size:10px;font-weight:700;color:var(--navy);background:var(--gold);padding:2px 7px;border-radius:4px;letter-spacing:0.05em}
+.hist-total{font-size:18px;font-weight:700;color:var(--gold)}
+.hist-delete{font-size:20px;color:var(--txt3);padding:0 4px;cursor:pointer;line-height:1;margin-left:6px}
+.hist-delete:active{color:var(--red)}
+.wdc-verdict-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+
+/* WEEK VIEW */
+.week-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.week-nav{display:flex;align-items:center;gap:10px}
+.week-nav-btn{width:32px;height:32px;border-radius:8px;background:var(--navy4);border:0.5px solid var(--gold-border);color:var(--gold);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.week-label{font-size:12px;color:var(--txt2);min-width:130px;text-align:center}
+.print-btn{padding:8px 14px;border-radius:8px;background:var(--navy4);border:0.5px solid var(--gold-border);color:var(--gold);font-size:12px;cursor:pointer;font-family:inherit;font-weight:600}
+.week-grid{display:flex;flex-direction:column;gap:10px}
+.week-day-card{background:var(--navy3);border:0.5px solid var(--gold-border);border-radius:12px;overflow:hidden}
+.wdc-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:0.5px solid var(--gold-border);background:var(--navy4)}
+.wdc-day{font-size:13px;font-weight:700;color:var(--gold)}
+.wdc-date{font-size:11px;color:var(--txt3)}
+.wdc-score{font-size:18px;font-weight:700;color:var(--gold)}
+.wdc-empty{font-size:11px;color:var(--txt3);font-style:italic}
+.wdc-body{padding:12px 14px}
+.wdc-setup{font-size:12px;color:var(--txt2);margin-bottom:8px;font-style:italic}
+.wdc-cats{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:8px}
+.wdc-cat{text-align:center;background:var(--navy4);border-radius:6px;padding:5px 2px;border:0.5px solid var(--gold-border)}
+.wdc-cat-label{font-size:8px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px}
+.wdc-cat-val{font-size:14px;font-weight:700;color:var(--gold)}
+.wdc-haul{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.wdc-haul-chip{background:var(--navy4);border:0.5px solid var(--gold-border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--txt2)}
+.wdc-haul-chip span{color:var(--gold);font-weight:600}
+.wdc-verdict-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wk-summary{background:var(--navy3);border:0.5px solid var(--gold);border-radius:12px;padding:14px;margin-top:12px;text-align:center}
+.wk-sum-title{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
+.wk-sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.wk-sum-cell{background:var(--navy4);border-radius:8px;padding:8px 4px;border:0.5px solid var(--gold-border)}
+.wk-sum-num{font-size:22px;font-weight:700;color:var(--gold)}
+.wk-sum-lbl{font-size:10px;color:var(--txt3);margin-top:2px}
+
+/* CREW INTELLIGENCE TAB */
+.ci-header{text-align:center;padding:20px 14px 16px;border-bottom:0.5px solid var(--gold-border);margin-bottom:16px}
+.ci-eyebrow{font-size:9px;font-weight:700;color:var(--txt3);letter-spacing:0.18em;text-transform:uppercase;margin-bottom:6px}
+.ci-title{font-size:20px;font-weight:700;color:var(--gold);margin-bottom:2px}
+.ci-sub{font-size:11px;color:var(--txt3)}
+.ci-empty{text-align:center;padding:40px 20px;color:var(--txt3);font-size:13px;line-height:1.7}
+.ci-empty-icon{font-size:36px;margin-bottom:10px}
+
+/* stat cards */
+.ci-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.ci-card{background:var(--navy3);border:0.5px solid var(--gold-border);border-radius:12px;padding:14px;text-align:center}
+.ci-card.ci-full{grid-column:1/-1;text-align:left}
+.ci-card-label{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+.ci-card-val{font-size:28px;font-weight:700;color:var(--gold);line-height:1;margin-bottom:2px}
+.ci-card-sub{font-size:10px;color:var(--txt2)}
+
+/* verdict breakdown */
+.ci-vd-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid rgba(201,168,76,0.1)}
+.ci-vd-row:last-child{border-bottom:none}
+.ci-vd-badge{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+.ci-vd-name{font-size:12px;color:var(--txt2);flex:1}
+.ci-vd-count{font-size:12px;font-weight:700;color:var(--gold);width:28px;text-align:right}
+.ci-vd-bar-wrap{flex:2;height:5px;background:var(--navy4);border-radius:3px;overflow:hidden}
+.ci-vd-bar{height:100%;border-radius:3px;background:var(--gold);transition:width .4s}
+.ci-vd-pct{font-size:10px;color:var(--txt3);width:32px;text-align:right}
+
+/* cat calibration */
+.ci-cat-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:0.5px solid rgba(201,168,76,0.1)}
+.ci-cat-row:last-child{border-bottom:none}
+.ci-cat-name{font-size:11px;color:var(--txt2);width:90px;flex-shrink:0}
+.ci-cat-bar-wrap{flex:1;height:5px;background:var(--navy4);border-radius:3px;overflow:hidden}
+.ci-cat-bar{height:100%;border-radius:3px;transition:width .4s}
+.ci-cat-val{font-size:11px;font-weight:700;color:var(--gold);width:28px;text-align:right;flex-shrink:0}
+
+/* outcome picker — on scorecard */
+.outcome-section{background:var(--navy3);border:0.5px solid var(--gold-border);border-radius:12px;padding:14px;margin-bottom:12px}
+.outcome-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.outcome-icon{font-size:16px}
+.outcome-title{font-size:13px;font-weight:600;color:var(--gold)}
+.outcome-row{display:flex;gap:8px;margin-bottom:12px}
+.outcome-btn{flex:1;padding:9px 0;border-radius:8px;border:0.5px solid var(--gold-border);font-size:12px;font-weight:700;cursor:pointer;background:var(--navy4);color:var(--txt3);font-family:inherit;transition:all .12s;letter-spacing:0.04em}
+.outcome-btn.win{border-color:#639922;background:rgba(99,153,34,0.15);color:#97C459}
+.outcome-btn.loss{border-color:#A32D2D;background:rgba(163,45,45,0.12);color:var(--red)}
+.outcome-btn.scratch{border-color:var(--amber);background:rgba(239,159,39,0.1);color:var(--amber)}
+.actual-pts-row{display:flex;align-items:center;gap:10px}
+.actual-pts-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap}
+.actual-pts-input{flex:1;border:0.5px solid var(--gold-border);border-radius:8px;padding:7px 10px;font-size:13px;background:var(--navy4);color:var(--txt);font-family:inherit;outline:none;width:100%}
+.actual-pts-input:focus{border-color:var(--gold)}
+.actual-pts-unit{font-size:11px;color:var(--txt3);white-space:nowrap}
+
+/* Heat Taken + Vault Yield sub-cards */
+.outcome-sub-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.outcome-sub{background:var(--navy4);border:0.5px solid var(--gold-border);border-radius:10px;padding:10px 12px}
+.outcome-sub-label{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
+.outcome-sub-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.outcome-sub-input{flex:1;min-width:0;border:0.5px solid var(--gold-border);border-radius:6px;padding:5px 8px;font-size:13px;font-weight:600;background:var(--navy3);color:var(--txt);font-family:inherit;outline:none;width:100%}
+.outcome-sub-input:focus{border-color:var(--gold)}
+.outcome-sub-unit{font-size:10px;color:var(--txt3);white-space:nowrap;flex-shrink:0}
+.outcome-sub-select{width:100%;border:0.5px solid var(--gold-border);border-radius:6px;padding:5px 8px;font-size:11px;background:var(--navy3);color:var(--txt);font-family:inherit;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none}
+.vy-pct{font-size:20px;font-weight:700;color:var(--gold);text-align:center;margin-top:4px;min-height:24px}
+@media print{
+  body{background:#fff!important;color:#111!important}
+  .banner,.score-panel,.nav,.action-row,.weakest-vault,.haul-card,.no-print{display:none!important}
+  .tab{display:none!important;padding:0!important}
+  #tab-week{display:block!important}
+  .week-nav-btn,.print-btn{display:none!important}
+  .week-day-card{border:1px solid #ccc!important;background:#fff!important;page-break-inside:avoid;margin-bottom:8px;border-radius:4px!important}
+  .wdc-head{background:#f5f5f5!important;border-bottom:1px solid #ccc!important}
+  .wdc-day,.wdc-score,.wdc-cat-val,.wk-sum-num{color:#111!important}
+  .wdc-date,.wdc-cat-label,.wdc-setup,.wk-sum-lbl,.wk-sum-title,.wdc-empty,.week-label,.wdc-haul-chip{color:#555!important}
+  .wdc-haul-chip span{color:#333!important}
+  .wdc-cat,.wk-sum-cell,.wdc-haul-chip{background:#f9f9f9!important;border:1px solid #ddd!important;border-radius:4px!important}
+  .wdc-body{background:#fff!important}
+  .wk-summary{background:#f5f5f5!important;border:1px solid #bbb!important;border-radius:4px!important}
+  .wdc-verdict-pill{color:#333!important;border:1px solid #999!important;background:#eee!important}
+  .week-header{margin-bottom:10px!important}
+  h2.print-title{display:block!important;font-size:16px;color:#111;margin-bottom:12px;font-family:sans-serif;font-weight:700;border-bottom:1px solid #ccc;padding-bottom:6px}
+  .print-logo{display:flex!important}
+}
+h2.print-title{display:none}
+.print-logo{display:none;align-items:center;gap:10px;margin-bottom:12px}
+.print-logo img{width:36px;height:36px;border-radius:6px}
+.print-logo-text{font-size:15px;font-weight:700;color:#111}
+</style>
+</head>
+<body>
+
+<!-- BANNER -->
+<div class="banner">
+  <div class="banner-logo">
+    <img src="https://raw.githubusercontent.com/BankHeistSnipe/Bank-Heist-Crew-Journal/main/BHC%20Logo.png" alt="BHC Logo">
+  </div>
+  <div class="banner-text">
+    <div class="banner-title">Heist Metrics</div>
+    <div class="banner-sub">Bank Heist Crew</div>
+  </div>
+  <div class="banner-right">
+    <div class="day-label" id="banner-day">&#8212;</div>
+    <input type="date" class="date-input" id="date-picker">
+  </div>
+</div>
+
+<!-- STICKY SCORE PANEL — centerpiece -->
+<div class="score-panel">
+  <div class="sp-hero" id="sp-status">
+    <div class="sp-status-eyebrow" id="sp-status-eyebrow" style="color:var(--txt3)">Mission Unscored</div>
+    <!-- GO / STAND DOWN chip -->
+    <div class="sp-go-chip" id="sp-go-chip" style="display:none">
+      <span class="sp-go-dot" id="sp-go-dot"></span>
+      <span class="sp-go-word" id="sp-go-word"></span>
+    </div>
+    <div class="sp-status-class" id="sp-status-class" style="color:var(--txt3);display:none"></div>
+    <!-- Score number -->
+    <div class="sp-score-row">
+      <div class="sp-num" id="sp-total">—</div>
+      <div class="sp-sep">/</div>
+      <div class="sp-denom">25</div>
+    </div>
+  </div>
+  <!-- Category rows -->
+  <div class="sp-cats">
+    <div class="sp-cat-row"><span class="sp-cat-name">Probability</span><span class="sp-cat-stars" id="sps-prob" style="color:var(--txt3)">☆☆☆☆☆</span></div>
+    <div class="sp-cat-row"><span class="sp-cat-name">Efficiency</span><span class="sp-cat-stars" id="sps-eff" style="color:var(--txt3)">☆☆☆☆☆</span></div>
+    <div class="sp-cat-row"><span class="sp-cat-name">Heat</span><span class="sp-cat-stars" id="sps-heat" style="color:var(--txt3)">☆☆☆☆☆</span></div>
+    <div class="sp-cat-row"><span class="sp-cat-name">Distance</span><span class="sp-cat-stars" id="sps-dist" style="color:var(--txt3)">☆☆☆☆☆</span></div>
+    <div class="sp-cat-row"><span class="sp-cat-name">Complexity</span><span class="sp-cat-stars" id="sps-comp" style="color:var(--txt3)">☆☆☆☆☆</span></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nav-btn active" onclick="switchTab('score',this)">Scorecard</button>
+  <button class="nav-btn" onclick="switchTab('history',this)">History</button>
+  <button class="nav-btn" onclick="switchTab('week',this)">Week View</button>
+  <button class="nav-btn" onclick="switchTab('intel',this)">🏆 Intel</button>
+</div>
+
+<!-- ═══ SCORECARD TAB ═══ -->
+<div class="tab active" id="tab-score">
+
+  <!-- TARGET VAULT -->
+  <div class="vault-section">
+    <div class="vault-section-head"><span class="vault-section-icon">&#127919;</span><span class="vault-section-name">Target Vault</span></div>
+    <div class="field-row">
+      <div class="field-label">Market</div>
+      <div class="mkt-row">
+        <button class="mkt-btn" id="mkt-ym" onclick="toggleMkt('YM')">YM</button>
+        <button class="mkt-btn" id="mkt-nq" onclick="toggleMkt('NQ')">NQ</button>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-label">Setup</div>
+      <select class="setup-select" id="setup-select" onchange="syncSetupDropdown()">
+        <option value="">Select setup&#8230;</option>
+        <option>🏦 Inside Job (Failed Reclaim)</option>
+        <option>💵 Loose Cash (Gap Fill)</option>
+        <option>💥 Vault Breach (Liquidity Sweep)</option>
+        <option>📋 Blueprint Hit (HTF Level Reclaim)</option>
+        <option>🚗 Getaway Route (Range Expansion)</option>
+        <option>🎭 Unmarked Score (Custom&#8230;)</option>
+      </select>
+      <input type="text" class="setup-text-input" id="setup-custom" placeholder="Describe setup&#8230;" style="display:none">
+    </div>
+    <div class="field-row">
+      <div class="field-label">Session</div>
+      <div class="radio-row" id="session-group">
+        <label class="radio-chip" id="rc-tok"><input type="radio" name="session" value="Tokyo" onchange="syncRadio('session-group','rc-tok')"> Tokyo</label>
+        <label class="radio-chip" id="rc-lon"><input type="radio" name="session" value="London" onchange="syncRadio('session-group','rc-lon')"> London</label>
+        <label class="radio-chip" id="rc-ny"><input type="radio" name="session" value="NY" onchange="syncRadio('session-group','rc-ny')"> NY</label>
+      </div>
+    </div>
+    <div class="field-row" style="margin-bottom:0">
+      <div class="field-label">Market Character</div>
+      <div class="radio-row" id="char-group">
+        <label class="radio-chip" id="rc-exp"><input type="radio" name="mchar" value="Expansion" onchange="syncRadio('char-group','rc-exp')"> Expansion</label>
+        <label class="radio-chip" id="rc-dis"><input type="radio" name="mchar" value="Distribution" onchange="syncRadio('char-group','rc-dis')"> Distribution</label>
+        <label class="radio-chip" id="rc-com"><input type="radio" name="mchar" value="Compression" onchange="syncRadio('char-group','rc-com')"> Compression</label>
+        <label class="radio-chip" id="rc-rot"><input type="radio" name="mchar" value="Rotation" onchange="syncRadio('char-group','rc-rot')"> Rotation</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROBABILITY -->
+  <div class="card">
+    <div class="card-head"><span class="card-icon">&#127919;</span><span class="card-name">Probability</span></div>
+    <div class="card-sub">How likely is this setup to work?</div>
+    <div class="factors">
+      <label class="factor" id="fl-htf"><input type="checkbox" id="f-htf" onchange="syncFactor(this,'fl-htf')"> HTF Alignment</label>
+      <label class="factor" id="fl-loc"><input type="checkbox" id="f-loc" onchange="syncFactor(this,'fl-loc')"> Location</label>
+      <label class="factor" id="fl-ses"><input type="checkbox" id="f-ses" onchange="syncFactor(this,'fl-ses')"> Session</label>
+      <label class="factor" id="fl-mkt"><input type="checkbox" id="f-mkt" onchange="syncFactor(this,'fl-mkt')"> Market Character</label>
+      <label class="factor" id="fl-inv"><input type="checkbox" id="f-inv" onchange="syncFactor(this,'fl-inv')"> Inventory</label>
+    </div>
+    <div class="star-row" id="s-prob">
+      <div class="star-opt" onclick="setScore('prob',5)" data-val="5"><span class="star-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="star-label">75%+</span><span class="star-descriptor">Very likely</span></div>
+      <div class="star-opt" onclick="setScore('prob',4)" data-val="4"><span class="star-stars">&#9733;&#9733;&#9733;&#9733;</span><span class="star-label">65&#8211;75%</span></div>
+      <div class="star-opt" onclick="setScore('prob',3)" data-val="3"><span class="star-stars">&#9733;&#9733;&#9733;</span><span class="star-label">55&#8211;65%</span></div>
+      <div class="star-opt" onclick="setScore('prob',2)" data-val="2"><span class="star-stars">&#9733;&#9733;</span><span class="star-label">Below 55%</span></div>
+      <div class="star-opt" onclick="setScore('prob',1)" data-val="1"><span class="star-stars">&#9733;</span><span class="star-label">Low probability</span></div>
+    </div>
+    <textarea class="notes-ta" id="n-prob" placeholder="Notes&#8230;"></textarea>
+  </div>
+
+  <!-- EFFICIENCY -->
+  <div class="card">
+    <div class="card-head"><span class="card-icon">&#9889;</span><span class="card-name">Efficiency</span></div>
+    <div class="card-sub">How quickly does it pay?</div>
+    <div class="star-row" id="s-eff">
+      <div class="star-opt" onclick="setScore('eff',5)" data-val="5"><span class="star-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="star-label">15&#8211;30 min</span><span class="star-descriptor">Immediate expansion</span></div>
+      <div class="star-opt" onclick="setScore('eff',4)" data-val="4"><span class="star-stars">&#9733;&#9733;&#9733;&#9733;</span><span class="star-label">Within 1 hour</span></div>
+      <div class="star-opt" onclick="setScore('eff',3)" data-val="3"><span class="star-stars">&#9733;&#9733;&#9733;</span><span class="star-label">Within session</span></div>
+      <div class="star-opt" onclick="setScore('eff',2)" data-val="2"><span class="star-stars">&#9733;&#9733;</span><span class="star-label">Multi-session hold</span></div>
+      <div class="star-opt" onclick="setScore('eff',1)" data-val="1"><span class="star-stars">&#9733;</span><span class="star-label">Chop / slow grind</span></div>
+    </div>
+    <div class="field-label" style="margin-top:2px;margin-bottom:8px">Expected Hold</div>
+    <div class="hold-row" id="hold-group">
+      <label class="hold-chip" id="hc-5"><input type="radio" name="hold" value="5-15 min" onchange="syncHold('hc-5')"> 5–15 min</label>
+      <label class="hold-chip" id="hc-15"><input type="radio" name="hold" value="15-30 min" onchange="syncHold('hc-15')"> 15–30 min</label>
+      <label class="hold-chip" id="hc-30"><input type="radio" name="hold" value="30-60 min" onchange="syncHold('hc-30')"> 30–60 min</label>
+      <label class="hold-chip" id="hc-60"><input type="radio" name="hold" value="1-2 hrs" onchange="syncHold('hc-60')"> 1–2 hrs</label>
+      <label class="hold-chip" id="hc-ses"><input type="radio" name="hold" value="Session" onchange="syncHold('hc-ses')"> Session</label>
+    </div>
+    <textarea class="notes-ta" id="n-eff" placeholder="Notes&#8230;"></textarea>
+  </div>
+
+  <!-- HEAT -->
+  <div class="card">
+    <div class="card-head"><span class="card-icon">&#128293;</span><span class="card-name">Heat</span></div>
+    <div class="card-sub">How much pain before I'm right?</div>
+    <div class="heat-slider-wrap">
+      <input type="range" class="heat-slider" id="heat-slider" min="1" max="5" step="1" value="3" oninput="setHeat(this.value)">
+      <div class="heat-labels">
+        <div class="heat-lbl">Dumpster Fire</div>
+        <div class="heat-lbl">Uncomfortable</div>
+        <div class="heat-lbl">Moderate</div>
+        <div class="heat-lbl">Acceptable</div>
+        <div class="heat-lbl">Minimal</div>
+      </div>
+      <div class="heat-current" id="heat-current" style="color:var(--txt3)">Move slider to set heat level</div>
+    </div>
+    <textarea class="notes-ta" id="n-heat" placeholder="Notes&#8230;"></textarea>
+  </div>
+
+  <!-- DISTANCE -->
+  <div class="card">
+    <div class="card-head"><span class="card-icon">&#128176;</span><span class="card-name">Distance</span></div>
+    <div class="card-sub">How much money is available?</div>
+    <div class="dist-grid">
+      <div>
+        <div class="dist-group-label">YM</div>
+        <label class="dist-check"><input type="checkbox" id="ym-80"> Quick Hit (80)</label>
+        <label class="dist-check"><input type="checkbox" id="ym-150"> Cash Run (150)</label>
+        <label class="dist-check"><input type="checkbox" id="ym-300"> Empty the Vault (300)</label>
+      </div>
+      <div>
+        <div class="dist-group-label">NQ</div>
+        <label class="dist-check"><input type="checkbox" id="nq-50"> Quick Hit (50)</label>
+        <label class="dist-check"><input type="checkbox" id="nq-120"> Cash Run (120)</label>
+        <label class="dist-check"><input type="checkbox" id="nq-250"> Empty the Vault (250)</label>
+      </div>
+    </div>
+    <div class="star-row" id="s-dist">
+      <div class="star-opt" onclick="setScore('dist',5)" data-val="5"><span class="star-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="star-label">Large expansion</span></div>
+      <div class="star-opt" onclick="setScore('dist',4)" data-val="4"><span class="star-stars">&#9733;&#9733;&#9733;&#9733;</span><span class="star-label">Good expansion</span></div>
+      <div class="star-opt" onclick="setScore('dist',3)" data-val="3"><span class="star-stars">&#9733;&#9733;&#9733;</span><span class="star-label">Moderate move</span></div>
+      <div class="star-opt" onclick="setScore('dist',2)" data-val="2"><span class="star-stars">&#9733;&#9733;</span><span class="star-label">Small move</span></div>
+      <div class="star-opt" onclick="setScore('dist',1)" data-val="1"><span class="star-stars">&#9733;</span><span class="star-label">Scalp only</span></div>
+    </div>
+    <textarea class="notes-ta" id="n-dist" placeholder="Notes&#8230;"></textarea>
+  </div>
+
+  <!-- COMPLEXITY -->
+  <div class="card">
+    <div class="card-head"><span class="card-icon">&#129504;</span><span class="card-name">Complexity</span></div>
+    <div class="card-sub">How many things need to happen?</div>
+    <div class="star-row" id="s-comp">
+      <div class="star-opt" onclick="setScore('comp',5)" data-val="5"><span class="star-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="star-label">One trigger</span><span class="star-descriptor">Pull up, get in</span></div>
+      <div class="star-opt" onclick="setScore('comp',4)" data-val="4"><span class="star-stars">&#9733;&#9733;&#9733;&#9733;</span><span class="star-label">Two confirmations</span><span class="star-descriptor">Wait for it</span></div>
+      <div class="star-opt" onclick="setScore('comp',3)" data-val="3"><span class="star-stars">&#9733;&#9733;&#9733;</span><span class="star-label">Three factors</span><span class="star-descriptor">Manageable</span></div>
+      <div class="star-opt" onclick="setScore('comp',2)" data-val="2"><span class="star-stars">&#9733;&#9733;</span><span class="star-label">Perfect conditions</span><span class="star-descriptor">Low odds it stacks</span></div>
+      <div class="star-opt" onclick="setScore('comp',1)" data-val="1"><span class="star-stars">&#9733;</span><span class="star-label">NASA launch sequence</span><span class="star-descriptor">Walk away</span></div>
+    </div>
+    <textarea class="notes-ta" id="n-comp" placeholder="Notes&#8230;"></textarea>
+  </div>
+
+  <!-- EXPECTED HAUL -->
+  <div class="haul-card" id="haul-card">
+    <div class="haul-header"><span class="haul-icon">&#128178;</span><span class="haul-title">Expected Haul</span></div>
+    <div id="haul-body"><div style="text-align:center;padding:12px 0 8px"><div style="font-size:20px;margin-bottom:4px">⚪</div><div style="font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:3px">Intelligence Pending</div><div style="font-size:11px;color:var(--txt3)">Score your setup to activate</div></div></div>
+  </div>
+
+  <!-- WEAKEST VAULT TEST -->
+  <div class="weakest-vault">
+    <div class="wv-header"><span class="wv-icon">&#127968;</span><span class="wv-title">Weakest Vault Test</span></div>
+    <div class="wv-question">Is this the easiest vault available today?</div>
+    <div class="wv-radio-row">
+      <label class="wv-radio-opt wv-yes-opt" id="wv-yes-lbl" onclick="setVault('yes')">
+        <input type="radio" name="vault" value="yes"> &#10003; YES
+      </label>
+      <label class="wv-radio-opt wv-no-opt" id="wv-no-lbl" onclick="setVault('no')">
+        <input type="radio" name="vault" value="no"> &#10007; NO
+      </label>
+    </div>
+    <div class="vault-response vr-go" id="vr-yes">
+      <div class="vr-status-label" style="color:#97C459">&#127942; Suit Up</div>
+      <div class="vr-status-word" style="color:#97C459">GO</div>
+      <div class="vr-status-sub" style="color:#97C459">Weakest vault confirmed.<br>Execute and disappear.</div>
+    </div>
+    <div class="vault-response vr-standdown" id="vr-no">
+      <div class="vr-status-label" style="color:var(--red)">&#128660; Abort Mission</div>
+      <div class="vr-status-word" style="color:var(--red)">STAND DOWN</div>
+      <div class="vr-status-sub" style="color:var(--red)">Find a better robbery.</div>
+    </div>
+  </div>
+
+  <!-- OUTCOME — for Crew Intelligence -->
+  <div class="outcome-section">
+    <div class="outcome-head"><span class="outcome-icon">📊</span><span class="outcome-title">Outcome <span style="font-size:10px;font-weight:400;color:var(--txt3)">(fill after the trade)</span></span></div>
+    <div class="outcome-row">
+      <button class="outcome-btn" id="oc-win"  onclick="setOutcome('win')">✓ Win</button>
+      <button class="outcome-btn" id="oc-loss" onclick="setOutcome('loss')">✗ Loss</button>
+      <button class="outcome-btn" id="oc-scr"  onclick="setOutcome('scratch')">— Scratch</button>
+    </div>
+    <div class="actual-pts-row" style="margin-bottom:0">
+      <span class="actual-pts-label">Actual pts</span>
+      <input type="number" class="actual-pts-input" id="actual-pts" placeholder="e.g. 142" oninput="updateVaultYieldPct()">
+      <span class="actual-pts-unit">pts</span>
+    </div>
+    <div class="outcome-sub-grid">
+
+      <!-- HEAT TAKEN (MAE) -->
+      <div class="outcome-sub">
+        <div class="outcome-sub-label">🔥 Heat Taken</div>
+        <div class="outcome-sub-row">
+          <input type="number" class="outcome-sub-input" id="heat-taken-pts" placeholder="e.g. 18" min="0">
+          <span class="outcome-sub-unit">pts against</span>
+        </div>
+        <select class="outcome-sub-select" id="heat-taken-level">
+          <option value="">Level…</option>
+          <option value="Minimal">Minimal</option>
+          <option value="Acceptable">Acceptable</option>
+          <option value="Moderate">Moderate</option>
+          <option value="Heavy">Heavy</option>
+          <option value="Dumpster Fire">Dumpster Fire</option>
+        </select>
+      </div>
+
+      <!-- VAULT YIELD (MFE) -->
+      <div class="outcome-sub">
+        <div class="outcome-sub-label">🏦 Vault Yield</div>
+        <div class="outcome-sub-row">
+          <input type="number" class="outcome-sub-input" id="vy-available" placeholder="Available" min="0" oninput="updateVaultYieldPct()">
+          <span class="outcome-sub-unit">avail</span>
+        </div>
+        <div class="vy-pct" id="vy-pct">—</div>
+        <div style="font-size:9px;color:var(--txt3);text-align:center">Collected / Available</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="save-btn" onclick="saveEntry()">&#127968; Log Heist</button>
+    <button class="reset-btn no-print" onclick="resetAll()">Reset</button>
+  </div>
+
+</div><!-- /tab-score -->
+
+<!-- ═══ HISTORY TAB ═══ -->
+<div class="tab" id="tab-history">
+  <div id="history-list"></div>
+</div>
+
+<!-- ═══ WEEK TAB ═══ -->
+<div class="tab" id="tab-week">
+  <div class="print-logo">
+    <img src="https://raw.githubusercontent.com/BankHeistSnipe/Bank-Heist-Crew-Journal/main/BHC%20Logo.png" alt="BHC">
+    <div class="print-logo-text">BHC Heist Metrics &#8212; Weekly Report</div>
+  </div>
+  <h2 class="print-title">BHC Heist Metrics &#8212; Weekly Report</h2>
+  <div class="week-header">
+    <div class="week-nav">
+      <button class="week-nav-btn" onclick="shiftWeek(-1)">&#8249;</button>
+      <div class="week-label" id="week-label">This week</div>
+      <button class="week-nav-btn" onclick="shiftWeek(1)">&#8250;</button>
+    </div>
+    <button class="print-btn no-print" onclick="window.print()">&#128424; Print week</button>
+  </div>
+  <div class="week-grid" id="week-grid"></div>
+  <div class="wk-summary" id="wk-summary" style="display:none"></div>
+</div>
+
+<!-- ═══ CREW INTELLIGENCE TAB ═══ -->
+<div class="tab" id="tab-intel">
+  <div class="ci-header">
+    <div class="ci-eyebrow">Crew Intelligence</div>
+    <div class="ci-title">🏆 Performance Report</div>
+    <div class="ci-sub" id="ci-sub">Last 30 heists</div>
+  </div>
+  <div id="ci-body"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CATS=['prob','eff','heat','dist','comp'];
+const scores={prob:0,eff:0,heat:0,dist:0,comp:0};
+const mkt={YM:false,NQ:false};
+let vaultChoice='';
+let outcomeChoice='';
+let weekOffset=0;
+let heatTouched=false;
+
+/* ── VERDICTS ── */
+const VERDICTS=[
+  {min:24,cls:'v-job',  badge:'🏆',title:'Inside Job',        sub:'Take it aggressively', range:'24–25'},
+  {min:21,cls:'v-pro',  badge:'🥇',title:'Professional Crew', sub:'High quality setup',   range:'21–23'},
+  {min:18,cls:'v-smash',badge:'🥈',title:'Smash & Grab',      sub:'Tradeable, not elite', range:'18–20'},
+  {min:15,cls:'v-cam',  badge:'🥉',title:'Too Many Cameras',  sub:'Reduce size',          range:'15–17'},
+  {min:0, cls:'v-walk', badge:'🚔',title:'Security Upgraded', sub:'Walk away',            range:'≤14'},
+];
+const VERDICT_COLORS={'v-job':'#C9A84C','v-pro':'#C9A84C','v-smash':'#378ADD','v-cam':'#EF9F27','v-walk':'#E24B4A'};
+function getVerdict(t){return VERDICTS.find(v=>t>=v.min);}
+
+/* Expected Haul lookup tables */
+// dist score → {YM pts, NQ pts} median expected move
+const DIST_PTS={5:{YM:300,NQ:250},4:{YM:150,NQ:120},3:{YM:100,NQ:80},2:{YM:60,NQ:50},1:{YM:25,NQ:20}};
+// eff score → expected hold time string
+const EFF_TIME={5:'15–30 min',4:'30–60 min',3:'1–3 hrs',2:'Multi-session',1:'Unknown'};
+// heat score → R label
+const HEAT_R={5:'Minimal — <0.5R',4:'Acceptable — ~1R',3:'Moderate — 1–2R',2:'High — 2–3R',1:'Extreme — 3R+'};
+
+const HEAT_LABELS=['','Dumpster Fire','Uncomfortable','Moderate','Acceptable','Minimal'];
+const HEAT_COLORS=['','#8B0000','#E24B4A','#EF9F27','#C9A84C','#639922'];
+
+/* ── DATE UTILS ── */
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dayName(ds){return new Date(ds+'T12:00:00').toLocaleDateString('en-US',{weekday:'long'});}
+function fmtDate(ds){return new Date(ds+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function getWeekDates(off){
+  const t=new Date();const dow=t.getDay();const m=new Date(t);
+  m.setDate(t.getDate()-(dow===0?6:dow-1)+off*7);
+  const d=[];for(let i=0;i<5;i++){const x=new Date(m);x.setDate(m.getDate()+i);d.push(x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'));}
+  return d;
+}
+
+/* ── DATE PICKER ── */
+const picker=document.getElementById('date-picker');
+picker.value=todayStr();
+document.getElementById('banner-day').textContent=dayName(todayStr());
+picker.addEventListener('change',function(){document.getElementById('banner-day').textContent=dayName(this.value);loadForDate(this.value);});
+
+/* ── MARKET ── */
+function toggleMkt(m){mkt[m]=!mkt[m];document.getElementById('mkt-'+m.toLowerCase()).classList.toggle('active',mkt[m]);updateHaul();}
+
+/* ── SETUP DROPDOWN ── */
+function syncSetupDropdown(){
+  const v=document.getElementById('setup-select').value;
+  document.getElementById('setup-custom').style.display=(v==='🎭 Unmarked Score (Custom…)')?'block':'none';
+}
+function getSetupValue(){
+  const v=document.getElementById('setup-select').value;
+  return (v==='🎭 Unmarked Score (Custom…)')?document.getElementById('setup-custom').value.trim():v;
+}
+
+/* ── RADIO / FACTOR ── */
+function syncFactor(el,lid){document.getElementById(lid).classList.toggle('checked',el.checked);}
+function syncRadio(gid,aid){
+  document.getElementById(gid).querySelectorAll('.radio-chip').forEach(c=>c.classList.remove('checked'));
+  document.getElementById(aid).classList.add('checked');
+}
+function syncHold(aid){
+  document.querySelectorAll('.hold-chip').forEach(c=>c.classList.remove('sel'));
+  document.getElementById(aid).classList.add('sel');
+  updateHaul();
+}
+function getHoldValue(){
+  const r=document.querySelector('input[name="hold"]:checked');return r?r.value:'';
+}
+
+/* ── SCORING ── */
+function setScore(cat,val){
+  scores[cat]=val;
+  document.getElementById('s-'+cat).querySelectorAll('.star-opt').forEach(el=>el.classList.toggle('sel',parseInt(el.dataset.val)===val));
+  updatePanel();
+  updateHaul();
+}
+
+function setHeat(val){
+  heatTouched=true;
+  scores.heat=parseInt(val);
+  const c=HEAT_COLORS[val],l=HEAT_LABELS[val];
+  const el=document.getElementById('heat-current');
+  el.textContent='★'.repeat(val)+'☆'.repeat(5-val)+' '+l;
+  el.style.color=c;
+  updatePanel();
+  updateHaul();
+}
+
+/* ── PANEL UPDATE ── */
+function updatePanel(){
+  const allFilled=CATS.every(k=>scores[k]>0);
+  const total=CATS.reduce((a,k)=>a+scores[k],0);
+  document.getElementById('sp-total').textContent=allFilled?total:'—';
+  CATS.forEach(k=>{
+    const v=scores[k];const el=document.getElementById('sps-'+k);
+    if(v>0){el.textContent='★'.repeat(v)+'☆'.repeat(5-v);el.style.color='var(--gold)';}
+    else{el.textContent='☆☆☆☆☆';el.style.color='var(--txt3)';}
+  });
+  const heroEl=document.getElementById('sp-status');
+  const eyebrowEl=document.getElementById('sp-status-eyebrow');
+  const chipEl=document.getElementById('sp-go-chip');
+  const dotEl=document.getElementById('sp-go-dot');
+  const wordEl=document.getElementById('sp-go-word');
+  const classEl=document.getElementById('sp-status-class');
+  if(allFilled){
+    const vd=getVerdict(total);
+    const isGo=total>=18;
+    heroEl.className='sp-hero '+(isGo?'sp-status-go':'sp-status-standdown');
+    eyebrowEl.textContent='Heist Status';
+    eyebrowEl.style.color=isGo?'#97C459':'#E24B4A';
+    chipEl.className='sp-go-chip '+(isGo?'chip-go':'chip-standdown');
+    chipEl.style.display='inline-flex';
+    dotEl.className='sp-go-dot '+(isGo?'dot-go':'dot-standdown');
+    wordEl.textContent=isGo?'GO':'STAND DOWN';
+    wordEl.style.color=isGo?'#97C459':'#E24B4A';
+    classEl.textContent=vd.title.toUpperCase();
+    classEl.style.color=isGo?'rgba(151,196,89,0.75)':'rgba(226,75,74,0.75)';
+    classEl.style.display='block';
+  }else{
+    heroEl.className='sp-hero';
+    eyebrowEl.textContent='Mission Unscored';
+    eyebrowEl.style.color='var(--txt3)';
+    chipEl.style.display='none';
+    classEl.style.display='none';
+  }
+}
+
+/* ── EXPECTED HAUL — weighted similarity engine ── */
+
+// Weights: Classification 40%, Market 25%, Hold 20%, Score proximity 15%
+const SIM_WEIGHTS={cls:0.40,mkt:0.25,hold:0.20,score:0.15};
+// Minimum similarity score to include in the pool
+const SIM_THRESHOLD=0.40;
+
+function scoreHeistSimilarity(e,currentTotal,currentVdCls,activeMkts,hold){
+  if(!e.total||!e.verdict||e.actualPts==null)return null;
+
+  // Classification (40%) — same = 1.0, adjacent tier = 0.5, further = 0
+  const TIER_ORDER=['v-job','v-pro','v-smash','v-cam','v-walk'];
+  const currTier=TIER_ORDER.indexOf(currentVdCls);
+  const candTier=TIER_ORDER.indexOf(e.verdict.cls);
+  const tierDist=Math.abs(currTier-candTier);
+  const clsScore=tierDist===0?1.0:tierDist===1?0.5:0;
+
+  // Market (25%) — same = 1.0, no market selected = 0.7 (partial credit), no overlap = 0
+  let mktScore=0;
+  if(activeMkts.length===0){
+    mktScore=0.7; // no filter set, can't penalise
+  }else{
+    const eMkts=e.market||[];
+    mktScore=activeMkts.some(m=>eMkts.includes(m))?1.0:0;
+  }
+
+  // Hold window (20%) — exact = 1.0, no hold selected = 0.6, mismatch = 0
+  let holdScore=0;
+  if(!hold||!e.expectedHold){
+    holdScore=0.6; // not enough info to penalise
+  }else{
+    holdScore=e.expectedHold===hold?1.0:0;
+  }
+
+  // Score proximity (15%) — linear decay: 0 diff = 1.0, 5+ diff = 0
+  const scoreDiff=Math.abs(e.total-currentTotal);
+  const scoreScore=Math.max(0,1-(scoreDiff/5));
+
+  const total=
+    clsScore   * SIM_WEIGHTS.cls  +
+    mktScore   * SIM_WEIGHTS.mkt  +
+    holdScore  * SIM_WEIGHTS.hold +
+    scoreScore * SIM_WEIGHTS.score;
+
+  return {entry:e, sim:total, clsScore, mktScore, holdScore, scoreScore};
+}
+
+function getSimilarHeists(){
+  const allFilled=CATS.every(k=>scores[k]>0);
+  if(!allFilled)return null;
+
+  const total=CATS.reduce((a,k)=>a+scores[k],0);
+  const vd=getVerdict(total);
+  const activeMkts=Object.keys(mkt).filter(k=>mkt[k]);
+  const hold=getHoldValue();
+
+  const all=getAllEntries();
+  const scored=Object.values(all)
+    .map(e=>scoreHeistSimilarity(e,total,vd.cls,activeMkts,hold))
+    .filter(r=>r&&r.sim>=SIM_THRESHOLD)
+    .sort((a,b)=>b.sim-a.sim);
+
+  // Weighted average pts (similarity score is the weight)
+  const withPts=scored.filter(r=>r.entry.actualPts!=null);
+  const avgSim=scored.length?Math.round(scored.reduce((a,r)=>a+r.sim,0)/scored.length*100):0;
+
+  return {scored, withPts, vd, total, activeMkts, hold, avgSim};
+}
+
+function updateHaul(){
+  const body=document.getElementById('haul-body');
+  const allFilled=CATS.every(k=>scores[k]>0);
+  const sim=allFilled?getSimilarHeists():null;
+
+  if(sim){
+    const {scored,withPts,vd,total,activeMkts,hold,avgSim}=sim;
+    const n=withPts.length;
+
+    // State
+    let state,dot,label,dotColor;
+    if(n<5){state='pending';dot='⚪';label='Intelligence Pending';dotColor='var(--txt3)';}
+    else if(n<20){state='estimated';dot='🟡';label='Estimated';dotColor='var(--amber)';}
+    else{state='calibrated';dot='🟢';label='Calibrated';dotColor='#97C459';}
+
+    // Weighted avg pts
+    let avgPts=null;
+    if(n>=5){
+      const wSum=withPts.reduce((a,r)=>a+r.sim,0);
+      avgPts=wSum>0?Math.round(withPts.reduce((a,r)=>a+r.entry.actualPts*r.sim,0)/wSum):null;
+    }
+
+    // Win rate
+    const withOutcome=scored.filter(r=>r.entry.outcome);
+    const wins=withOutcome.filter(r=>r.entry.outcome==='win');
+    const winRate=n>=5&&withOutcome.length>0?Math.round(wins.length/withOutcome.length*100):null;
+
+    // Avg heat R
+    const HEAT_R_NUM={5:0.4,4:1.0,3:1.5,2:2.5,1:3.5};
+    const withHeat=scored.filter(r=>r.entry.scores&&r.entry.scores.heat);
+    const avgHeatR=n>=5&&withHeat.length>0
+      ?(withHeat.reduce((a,r)=>a+HEAT_R_NUM[r.entry.scores.heat],0)/withHeat.length).toFixed(1)+'R'
+      :null;
+
+    // Sample stability
+    const totalMatches=scored.length;
+    const countTier=totalMatches>=100?3:totalMatches>=40?2:totalMatches>=10?1:0;
+    const dates=scored.map(r=>r.entry.date).filter(Boolean)
+      .map(d=>new Date(d+'T12:00:00').getTime()).filter(t=>!isNaN(t)).sort((a,b)=>a-b);
+    let spreadTier=0;
+    if(dates.length>=2){
+      const spanDays=(dates[dates.length-1]-dates[0])/(1000*60*60*24);
+      spreadTier=spanDays>=180?3:spanDays>=60?2:spanDays>=14?1:0;
+    }
+    const stabilityScore=(countTier+spreadTier)/2;
+    let stabLabel,stabColor,stabDot;
+    if(stabilityScore>=2.5){stabLabel='Durable';stabColor='#97C459';stabDot='🟩';}
+    else if(stabilityScore>=1.5){stabLabel='Developing';stabColor='var(--amber)';stabDot='🟨';}
+    else{stabLabel='Regime Dependent';stabColor='#E24B4A';stabDot='🟥';}
+    const spanStr=_spanLabel(dates);
+
+    let html='';
+
+    if(state==='pending'){
+      // ── PENDING ──
+      html+='<div style="text-align:center;padding:4px 0 14px">'
+        +'<div style="font-size:24px;margin-bottom:6px">⚪</div>'
+        +'<div style="font-size:14px;font-weight:700;color:var(--txt2);margin-bottom:4px">Intelligence Pending</div>'
+        +'<div style="font-size:12px;color:var(--txt3);line-height:1.6">Log '+(5-n)+' more comparable heist'+(5-n!==1?'s':'')+' to begin calibration.'+(scored.length>0?' <span style=\"color:var(--txt3)\">('+ scored.length+' partial match'+(scored.length!==1?'es':'')+' found)</span>':'')+'</div>'
+        +'</div>';
+      html+=_targetProfile(vd,activeMkts,hold,total);
+    }else{
+      // ── ESTIMATED / CALIBRATED ──
+      // State header
+      html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
+        +'<span style="font-size:20px">'+dot+'</span>'
+        +'<div>'
+        +'<div style="font-size:15px;font-weight:700;color:'+dotColor+'">'+label+'</div>'
+        +'<div style="font-size:10px;color:var(--txt3);margin-top:1px">'+stabDot+' '+stabLabel+' · '+totalMatches+' heists'+(spanStr&&spanStr!=='single session'?' · '+spanStr:'')+'</div>'
+        +'</div>'
+        +'</div>';
+
+      // Big pts
+      html+='<div style="text-align:center;margin-bottom:14px">'
+        +'<div style="font-size:44px;font-weight:700;color:var(--gold);line-height:1;letter-spacing:-2px">'+(avgPts!=null?(avgPts>=0?'+':'')+avgPts:'—')+'</div>'
+        +'<div style="font-size:12px;color:var(--txt3);margin-top:3px">pts</div>'
+        +'</div>';
+
+      // Stat strip — WR · Heat · Matches
+      const sc=(lbl,val,col)=>'<div style="flex:1;text-align:center;padding:8px 4px;border-right:0.5px solid rgba(201,168,76,0.1)">'
+        +'<div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">'+lbl+'</div>'
+        +'<div style="font-size:16px;font-weight:700;color:'+(col||'var(--gold)')+'">'+val+'</div>'
+        +'</div>';
+      html+='<div style="display:flex;border:0.5px solid rgba(201,168,76,0.2);border-radius:10px;overflow:hidden;margin-bottom:12px">'
+        +sc('Win Rate', winRate!=null?winRate+'%':'—', winRate!=null?(winRate>=70?'#97C459':winRate>=50?'var(--gold)':'#E24B4A'):'var(--txt3)')
+        +sc('Avg Heat', avgHeatR||'—', null)
+        +'<div style="flex:1;text-align:center;padding:8px 4px">'
+        +'<div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Matches</div>'
+        +'<div style="font-size:16px;font-weight:700;color:var(--gold)">'+n+'</div>'
+        +'</div>'
+        +'</div>';
+
+      // Similarity bar
+      html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">'
+        +'<div style="font-size:10px;color:var(--txt3);white-space:nowrap;width:60px">Similarity</div>'
+        +'<div style="flex:1;height:3px;background:var(--navy4);border-radius:2px;overflow:hidden"><div style="width:'+avgSim+'%;height:100%;background:var(--gold);border-radius:2px"></div></div>'
+        +'<div style="font-size:11px;font-weight:700;color:var(--gold);white-space:nowrap">'+avgSim+'%</div>'
+        +'</div>';
+
+      // Matched on
+      html+='<div style="border-top:0.5px solid rgba(201,168,76,0.12);padding-top:10px">'
+        +'<div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:7px">Matched on</div>'
+        +_simBreakdownRows(vd,activeMkts,hold,total)
+        +'</div>';
+    }
+
+    body.innerHTML=html;
+    return;
+  }
+
+  // Pre-score: always show pending with partial target profile
+  const total2=CATS.reduce((a,k)=>a+scores[k],0);
+  const vd2=total2>0?getVerdict(total2):null;
+  const activeMkts2=Object.keys(mkt).filter(k=>mkt[k]);
+  const hold2=getHoldValue();
+  let html='<div style="text-align:center;padding:4px 0 14px">'
+    +'<div style="font-size:24px;margin-bottom:6px">⚪</div>'
+    +'<div style="font-size:14px;font-weight:700;color:var(--txt2);margin-bottom:4px">Intelligence Pending</div>'
+    +'<div style="font-size:12px;color:var(--txt3);line-height:1.6">Finish scoring to activate engine</div>'
+    +'</div>';
+  if(vd2||activeMkts2.length||hold2){
+    html+=_targetProfile(vd2,activeMkts2,hold2,total2);
+  }
+  body.innerHTML=html;
+}
+
+// Helper — Target Profile grid
+function _targetProfile(vd,activeMkts,hold,total){
+  const scoreRange=total>0?((Math.max(1,total-2))+' – '+(Math.min(25,total+2))):null;
+  return '<div style="border:0.5px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px;background:var(--navy4)">'
+    +'<div style="font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:10px">Target Profile</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+    +'<div><div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Classification</div><div style="font-size:12px;color:var(--txt2)">'+(vd?vd.badge+' '+vd.title:'Scoring…')+'</div></div>'
+    +'<div><div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Market</div><div style="font-size:12px;color:var(--txt2)">'+(activeMkts.length?activeMkts.join(' / '):'—')+'</div></div>'
+    +'<div><div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Hold</div><div style="font-size:12px;color:var(--txt2)">'+(hold||'—')+'</div></div>'
+    +'<div><div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Score Range</div><div style="font-size:12px;color:var(--txt2)">'+(scoreRange||'—')+'</div></div>'
+    +'</div></div>';
+}
+
+// Helper — human-readable date span label
+function _spanLabel(sortedTimestamps){
+  if(sortedTimestamps.length<2)return 'single session';
+  const spanDays=Math.round((sortedTimestamps[sortedTimestamps.length-1]-sortedTimestamps[0])/(1000*60*60*24));
+  if(spanDays>=365)return Math.round(spanDays/365)+'yr span';
+  if(spanDays>=30)return Math.round(spanDays/30)+'mo span';
+  if(spanDays>=7)return Math.round(spanDays/7)+'wk span';
+  return spanDays+'d span';
+}
+
+// Helper — renders the 4 weight dimension rows
+function _simBreakdownRows(vd,activeMkts,hold,total){
+  const rows=[
+    {label:'Classification',weight:'40%',val:vd.badge+' '+vd.title},
+    {label:'Market',        weight:'25%',val:activeMkts.length?activeMkts.join(' / '):'Any'},
+    {label:'Hold window',   weight:'20%',val:hold||'Any'},
+    {label:'Score range',   weight:'15%',val:(total-2)+'–'+(total+2)+' / 25'},
+  ];
+  return rows.map(r=>
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid rgba(201,168,76,0.07)">'
+    +'<span style="font-size:11px;color:var(--txt2)">'+r.label+'</span>'
+    +'<span style="font-size:10px;color:var(--txt3)">'+r.weight+'</span>'
+    +'<span style="font-size:11px;color:var(--gold);font-weight:600;max-width:120px;text-align:right">'+r.val+'</span>'
+    +'</div>'
+  ).join('');
+}
+
+/* ── VAULT TEST ── */
+function setVault(c){
+  vaultChoice=c;
+  document.getElementById('wv-yes-lbl').classList.toggle('sel',c==='yes');
+  document.getElementById('wv-no-lbl').classList.toggle('sel',c==='no');
+  document.getElementById('vr-yes').className='vault-response vr-go'+(c==='yes'?' show':'');
+  document.getElementById('vr-no').className='vault-response vr-standdown'+(c==='no'?' show':'');
+}
+
+/* ── OUTCOME ── */
+function setOutcome(c){
+  outcomeChoice=c;
+  ['win','loss','scratch'].forEach(o=>{
+    const btn=document.getElementById('oc-'+o.slice(0,3));
+    if(btn)btn.className='outcome-btn'+(o===c?' '+o:'');
+  });
+}
+function getActualPts(){
+  const v=document.getElementById('actual-pts').value;
+  return v!==''?parseFloat(v):null;
+}
+function getHeatTakenPts(){
+  const v=document.getElementById('heat-taken-pts').value;
+  return v!==''?parseFloat(v):null;
+}
+function getHeatTakenLevel(){
+  return document.getElementById('heat-taken-level').value||null;
+}
+function getVyAvailable(){
+  const v=document.getElementById('vy-available').value;
+  return v!==''?parseFloat(v):null;
+}
+function updateVaultYieldPct(){
+  const collected=getActualPts();
+  const available=getVyAvailable();
+  const el=document.getElementById('vy-pct');
+  if(collected!=null&&available!=null&&available>0){
+    const pct=Math.round(collected/available*100);
+    el.textContent=pct+'%';
+    el.style.color=pct>=80?'#97C459':pct>=50?'var(--gold)':'var(--amber)';
+  }else{
+    el.textContent='—';
+    el.style.color='var(--gold)';
+  }
+}
+function saveEntry(){
+  const dateKey=picker.value;
+  const total=CATS.reduce((a,k)=>a+scores[k],0);
+  const allFilled=CATS.every(k=>scores[k]>0);
+  const session=document.querySelector('input[name="session"]:checked');
+  const mchar=document.querySelector('input[name="mchar"]:checked');
+  const d=scores.dist,e=scores.eff,h=scores.heat;
+  const showMkts=Object.keys(mkt).filter(k=>mkt[k]);if(!showMkts.length)showMkts.push('YM','NQ');
+  const haul={};
+  showMkts.forEach(m=>{haul[m]=d?DIST_PTS[d][m]:null;});
+  haul.holdTime=e?EFF_TIME[e]:null;
+  haul.heat=h?HEAT_R[h]:null;
+  const entry={
+    date:dateKey,day:dayName(dateKey),
+    market:Object.keys(mkt).filter(k=>mkt[k]),
+    setup:getSetupValue(),session:session?session.value:'',marketChar:mchar?mchar.value:'',
+    expectedHold:getHoldValue(),
+    factors:{htf:document.getElementById('f-htf').checked,loc:document.getElementById('f-loc').checked,
+      ses:document.getElementById('f-ses').checked,mktChar:document.getElementById('f-mkt').checked,
+      inv:document.getElementById('f-inv').checked},
+    scores:{...scores},notes:{
+      prob:document.getElementById('n-prob').value,eff:document.getElementById('n-eff').value,
+      heat:document.getElementById('n-heat').value,dist:document.getElementById('n-dist').value,
+      comp:document.getElementById('n-comp').value},
+    haul,total:allFilled?total:null,
+    verdict:allFilled?getVerdict(total):null,
+    vault:vaultChoice,
+    outcome:outcomeChoice||null,
+    actualPts:getActualPts(),
+    heatTaken:{pts:getHeatTakenPts(), level:getHeatTakenLevel()},
+    vaultYield:{collected:getActualPts(), available:getVyAvailable(),
+      pct:(getActualPts()!=null&&getVyAvailable()>0)?Math.round(getActualPts()/getVyAvailable()*100):null},
+    savedAt:new Date().toISOString()
+  };
+  const all=getAllEntries();
+  all['hm_'+dateKey+'_'+Date.now()]=entry;
+  localStorage.setItem('bhc_heist_metrics',JSON.stringify(all));
+  showToast('Saved — '+entry.day+' '+fmtDate(dateKey));
+}
+
+function getAllEntries(){try{return JSON.parse(localStorage.getItem('bhc_heist_metrics')||'{}');}catch(e){return {};}}
+
+function loadForDate(ds){
+  const all=getAllEntries();
+  const forDay=Object.entries(all).filter(([k])=>k.startsWith('hm_'+ds+'_')).sort(([a],[b])=>b.localeCompare(a));
+  if(forDay.length)applyEntry(forDay[0][1]);else resetForm();
+}
+
+function applyEntry(e){
+  resetForm(false);
+  (e.market||[]).forEach(m=>{mkt[m]=true;document.getElementById('mkt-'+m.toLowerCase()).classList.add('active');});
+  const sel=document.getElementById('setup-select');
+  const opts=Array.from(sel.options).map(o=>o.value);
+  if(e.setup&&opts.includes(e.setup)){sel.value=e.setup;}
+  else if(e.setup){sel.value='🎭 Unmarked Score (Custom…)';document.getElementById('setup-custom').value=e.setup;document.getElementById('setup-custom').style.display='block';}
+  if(e.session){const r=document.querySelector('input[name="session"][value="'+e.session+'"]');if(r){r.checked=true;r.dispatchEvent(new Event('change'));}}
+  if(e.marketChar){const r=document.querySelector('input[name="mchar"][value="'+e.marketChar+'"]');if(r){r.checked=true;r.dispatchEvent(new Event('change'));}}
+  if(e.factors){
+    [{id:'htf',key:'htf'},{id:'loc',key:'loc'},{id:'ses',key:'ses'},{id:'mkt',key:'mktChar'},{id:'inv',key:'inv'}].forEach(({id,key})=>{
+      const v=e.factors[key]||false;
+      document.getElementById('f-'+id).checked=v;
+      document.getElementById('fl-'+id).classList.toggle('checked',v);
+    });
+  }
+  CATS.forEach(k=>{
+    const v=e.scores[k]||0;if(!v)return;
+    scores[k]=v;
+    if(k==='heat'){
+      heatTouched=true;
+      document.getElementById('heat-slider').value=v;
+      const el=document.getElementById('heat-current');
+      el.textContent='★'.repeat(v)+'☆'.repeat(5-v)+' '+HEAT_LABELS[v];
+      el.style.color=HEAT_COLORS[v];
+    }else{
+      document.getElementById('s-'+k).querySelectorAll('.star-opt').forEach(el=>el.classList.toggle('sel',parseInt(el.dataset.val)===v));
+    }
+  });
+  if(e.notes)CATS.forEach(k=>{document.getElementById('n-'+k).value=e.notes[k]||'';});
+  if(e.expectedHold){
+    const holdMap={'5-15 min':'hc-5','15-30 min':'hc-15','30-60 min':'hc-30','1-2 hrs':'hc-60','Session':'hc-ses'};
+    const r=document.querySelector('input[name="hold"][value="'+e.expectedHold+'"]');
+    if(r){r.checked=true;const cid=holdMap[e.expectedHold];if(cid)syncHold(cid);}
+  }
+  if(e.vault)setVault(e.vault);
+  if(e.outcome)setOutcome(e.outcome);
+  if(e.actualPts!=null)document.getElementById('actual-pts').value=e.actualPts;
+  if(e.heatTaken){
+    if(e.heatTaken.pts!=null)document.getElementById('heat-taken-pts').value=e.heatTaken.pts;
+    if(e.heatTaken.level)document.getElementById('heat-taken-level').value=e.heatTaken.level;
+  }
+  if(e.vaultYield&&e.vaultYield.available!=null){
+    document.getElementById('vy-available').value=e.vaultYield.available;
+  }
+  updateVaultYieldPct();
+  updatePanel();updateHaul();
+}
+
+function resetAll(){
+  picker.value=todayStr();document.getElementById('banner-day').textContent=dayName(todayStr());
+  resetForm();
+}
+function resetForm(){
+  CATS.forEach(k=>{
+    scores[k]=0;
+    if(k==='heat'){heatTouched=false;document.getElementById('heat-slider').value=3;const el=document.getElementById('heat-current');el.textContent='Move slider to set heat level';el.style.color='var(--txt3)';}
+    else{document.getElementById('s-'+k).querySelectorAll('.star-opt').forEach(el=>el.classList.remove('sel'));}
+    document.getElementById('n-'+k).value='';
+  });
+  ['YM','NQ'].forEach(m=>{mkt[m]=false;document.getElementById('mkt-'+m.toLowerCase()).classList.remove('active');});
+  ['htf','loc','ses','mkt','inv'].forEach(id=>{
+    document.getElementById('f-'+id).checked=false;
+    document.getElementById('fl-'+id).classList.remove('checked');
+  });
+  document.querySelectorAll('input[name="session"],input[name="mchar"],input[name="hold"]').forEach(r=>r.checked=false);
+  document.querySelectorAll('.radio-chip').forEach(c=>c.classList.remove('checked'));
+  document.querySelectorAll('.hold-chip').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('setup-select').value='';
+  document.getElementById('setup-custom').value='';
+  document.getElementById('setup-custom').style.display='none';
+  vaultChoice='';
+  document.getElementById('wv-yes-lbl').classList.remove('sel');
+  document.getElementById('wv-no-lbl').classList.remove('sel');
+  document.getElementById('vr-yes').className='vault-response vr-go';
+  document.getElementById('vr-no').className='vault-response vr-standdown';
+  outcomeChoice='';
+  ['win','loss','scratch'].forEach(o=>{const b=document.getElementById('oc-'+o.slice(0,3));if(b)b.className='outcome-btn';});
+  document.getElementById('actual-pts').value='';
+  document.getElementById('heat-taken-pts').value='';
+  document.getElementById('heat-taken-level').value='';
+  document.getElementById('vy-available').value='';
+  document.getElementById('vy-pct').textContent='—';
+  document.getElementById('vy-pct').style.color='var(--gold)';
+  document.getElementById('haul-body').innerHTML='<div style="text-align:center;padding:12px 0 8px"><div style="font-size:20px;margin-bottom:4px">⚪</div><div style="font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:3px">Intelligence Pending</div><div style="font-size:11px;color:var(--txt3)">Score your setup to activate</div></div>';
+  updatePanel();
+}
+
+/* ── VERDICT STYLE for history/week ── */
+function getVerdictStyle(cls){
+  const m={'v-job':'background:rgba(201,168,76,0.2);color:#C9A84C;border:0.5px solid #C9A84C',
+    'v-pro':'background:rgba(201,168,76,0.15);color:#C9A84C;border:0.5px solid rgba(201,168,76,0.5)',
+    'v-smash':'background:rgba(55,138,221,0.2);color:#378ADD;border:0.5px solid #185FA5',
+    'v-cam':'background:rgba(239,159,39,0.2);color:#EF9F27;border:0.5px solid #854F0B',
+    'v-walk':'background:rgba(226,75,74,0.2);color:#E24B4A;border:0.5px solid #A32D2D'};
+  return m[cls]||'';
+}
+
+/* ── HISTORY ── */
+function renderHistory(){
+  const all=getAllEntries();const list=document.getElementById('history-list');
+  const entries=Object.entries(all).sort(([a],[b])=>b.localeCompare(a));
+  if(!entries.length){list.innerHTML='<div class="hist-empty">No saved entries yet.<br>Score a setup and tap Save Entry.</div>';return;}
+  list.innerHTML=entries.map(([key,e])=>{
+    const vd=e.verdict;const mktStr=(e.market||[]).map(m=>'<span class="hist-mkt">'+m+'</span>').join('');
+    const vStyle=vd?getVerdictStyle(vd.cls):'';
+    const haulStr=e.haul?(Object.entries(e.haul).filter(([k,v])=>k!=='holdTime'&&k!=='heat'&&v).map(([k,v])=>k+': '+v+' pts').join(' · ')):'';
+    const holdStr=e.expectedHold?' · Hold: '+e.expectedHold:'';
+    return '<div class="hist-card" onclick="loadHistEntry(\''+key+'\')">'
+      +'<div class="hist-row"><div><div class="hist-day">'+e.day+'</div><div class="hist-date">'+fmtDate(e.date)+(e.session?' · '+e.session:'')+'</div></div>'
+      +'<div style="display:flex;align-items:center">'+(e.total?'<span class="hist-total">'+e.total+'<span style="font-size:12px;color:var(--txt3)">/25</span></span>':'<span style="font-size:12px;color:var(--txt3)">Incomplete</span>')
+      +'<span class="hist-delete" onclick="event.stopPropagation();deleteEntry(\''+key+'\')">×</span></div></div>'
+      +(e.setup?'<div class="hist-setup">"'+e.setup+'"'+(e.marketChar?' · '+e.marketChar:'')+'</div>':'')
+      +(haulStr||holdStr?'<div style="font-size:11px;color:var(--txt3);margin-bottom:6px">'+(haulStr||'')+holdStr+'</div>':'')
+      +'<div class="hist-chips">'+mktStr+(vd?'<span class="wdc-verdict-pill" style="'+vStyle+'">'+vd.badge+' '+vd.title+'</span>':'')
+      +(e.vault==='yes'?'<span style="font-size:10px;color:#97C459">✓ Easiest vault</span>':e.vault==='no'?'<span style="font-size:10px;color:var(--txt3)">✗ Left it</span>':'')
+      +(e.outcome==='win'?'<span style="font-size:10px;font-weight:700;color:#97C459;background:rgba(99,153,34,0.15);padding:2px 7px;border-radius:4px">WIN'+(e.actualPts!=null?' +'+e.actualPts+'pts':'')+'</span>':e.outcome==='loss'?'<span style="font-size:10px;font-weight:700;color:var(--red);background:rgba(226,75,74,0.12);padding:2px 7px;border-radius:4px">LOSS'+(e.actualPts!=null?' '+e.actualPts+'pts':'')+'</span>':e.outcome==='scratch'?'<span style="font-size:10px;font-weight:700;color:var(--amber);background:rgba(239,159,39,0.1);padding:2px 7px;border-radius:4px">SCRATCH</span>':'')
+      +(e.heatTaken&&e.heatTaken.level?'<span style="font-size:10px;color:var(--txt3)">🔥 '+(e.heatTaken.pts!=null?e.heatTaken.pts+'pts · ':'')+e.heatTaken.level+'</span>':'')
+      +(e.vaultYield&&e.vaultYield.pct!=null?'<span style="font-size:10px;color:var(--txt3)">🏦 '+e.vaultYield.pct+'% yield</span>':'')
+      +'</div></div>';
+  }).join('');
+}
+
+function loadHistEntry(key){
+  const e=getAllEntries()[key];if(!e)return;
+  picker.value=e.date;document.getElementById('banner-day').textContent=e.day;
+  applyEntry(e);
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn')[0].classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-score').classList.add('active');
+}
+function deleteEntry(key){
+  if(!confirm('Delete this entry?'))return;
+  const all=getAllEntries();delete all[key];
+  localStorage.setItem('bhc_heist_metrics',JSON.stringify(all));
+  renderHistory();renderWeek();
+}
+
+/* ── WEEK VIEW ── */
+function renderWeek(){
+  const days=getWeekDates(weekOffset);const all=getAllEntries();
+  const dayNames=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  const first=new Date(days[0]+'T12:00:00'),last=new Date(days[4]+'T12:00:00');
+  const opts={month:'short',day:'numeric'};
+  document.getElementById('week-label').textContent=first.toLocaleDateString('en-US',opts)+' – '+last.toLocaleDateString('en-US',{...opts,year:'numeric'});
+  let traded=0,totalScore=0,scoreCount=0;
+  const grid=document.getElementById('week-grid');
+  grid.innerHTML=days.map((ds,i)=>{
+    const forDay=Object.entries(all).filter(([k])=>k.startsWith('hm_'+ds+'_')).sort(([a],[b])=>b.localeCompare(a));
+    const best=forDay.length?forDay[0][1]:null;
+    if(best&&best.total){traded++;totalScore+=best.total;scoreCount++;}
+    if(!best)return '<div class="week-day-card"><div class="wdc-head"><div><div class="wdc-day">'+dayNames[i]+'</div><div class="wdc-date">'+fmtDate(ds)+'</div></div><div class="wdc-empty">No entry</div></div></div>';
+    const vd=best.verdict;const vStyle=vd?getVerdictStyle(vd.cls):'';
+    const mktStr=(best.market||[]).join(' & ')||'';
+    const catLabels=['Prob','Eff','Heat','Dist','Comp'];
+    const catHtml=CATS.map((k,ci)=>'<div class="wdc-cat"><div class="wdc-cat-label">'+catLabels[ci]+'</div><div class="wdc-cat-val">'+(best.scores[k]||'—')+'</div></div>').join('');
+    // haul chips
+    let haulHtml='';
+    if(best.haul){
+      const chips=[];
+      (best.market||['YM','NQ']).forEach(m=>{if(best.haul[m])chips.push('<div class="wdc-haul-chip">'+m+' <span>'+best.haul[m]+' pts</span></div>');});
+      if(best.haul.holdTime)chips.push('<div class="wdc-haul-chip">Eff Hold <span>'+best.haul.holdTime+'</span></div>');
+      if(best.expectedHold)chips.push('<div class="wdc-haul-chip">Expected <span>'+best.expectedHold+'</span></div>');
+      if(chips.length)haulHtml='<div class="wdc-haul">'+chips.join('')+'</div>';
+    }
+    return '<div class="week-day-card"><div class="wdc-head"><div><div class="wdc-day">'+dayNames[i]+(mktStr?' · '+mktStr:'')+'</div><div class="wdc-date">'+fmtDate(ds)+(best.session?' · '+best.session:'')+'</div></div>'
+      +(best.total?'<div class="wdc-score">'+best.total+'<span style="font-size:11px;color:var(--txt3)">/25</span></div>':'<div class="wdc-empty">Incomplete</div>')+'</div>'
+      +'<div class="wdc-body">'+(best.setup?'<div class="wdc-setup">"'+best.setup+'"'+(best.marketChar?' · '+best.marketChar:'')+'</div>':'')
+      +'<div class="wdc-cats">'+catHtml+'</div>'
+      +haulHtml
+      +'<div class="wdc-verdict-row">'+(vd?'<span class="wdc-verdict-pill" style="'+vStyle+'">'+vd.badge+' '+vd.title+'</span>':'')
+      +(best.vault==='yes'?'<span style="font-size:11px;color:#97C459;margin-left:4px">✓ Easiest vault</span>':'')
+      +(forDay.length>1?'<span style="font-size:10px;color:var(--txt3);margin-left:auto">'+forDay.length+' entries</span>':'')
+      +'</div></div></div>';
+  }).join('');
+  const sumEl=document.getElementById('wk-summary');
+  if(scoreCount>0){
+    sumEl.style.display='block';
+    sumEl.innerHTML='<div class="wk-sum-title">Week Summary</div><div class="wk-sum-grid">'
+      +'<div class="wk-sum-cell"><div class="wk-sum-num">'+traded+'</div><div class="wk-sum-lbl">Days scored</div></div>'
+      +'<div class="wk-sum-cell"><div class="wk-sum-num">'+(totalScore/scoreCount).toFixed(1)+'</div><div class="wk-sum-lbl">Avg score</div></div>'
+      +'<div class="wk-sum-cell"><div class="wk-sum-num">'+totalScore+'</div><div class="wk-sum-lbl">Total pts</div></div>'
+      +'</div>';
+  }else{sumEl.style.display='none';}
+}
+function shiftWeek(dir){weekOffset+=dir;if(weekOffset>0)weekOffset=0;renderWeek();}
+
+/* ── TAB SWITCH ── */
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='history')renderHistory();
+  if(name==='week')renderWeek();
+  if(name==='intel')renderIntel();
+}
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+/* ── CREW INTELLIGENCE ── */
+function renderIntel(){
+  const body=document.getElementById('ci-body');
+  const all=getAllEntries();
+  const entries=Object.values(all).sort((a,b)=>b.savedAt.localeCompare(a.savedAt));
+  const recent=entries.slice(0,30);
+  document.getElementById('ci-sub').textContent='Last '+recent.length+' heist'+(recent.length!==1?'s':'');
+
+  if(recent.length===0){
+    body.innerHTML='<div class="ci-empty"><div class="ci-empty-icon">🏦</div>No heists logged yet.<br>Complete your first scorecard,<br>hit Log Heist, and come back.</div>';
+    return;
+  }
+
+  // ── core stats
+  const scored=recent.filter(e=>e.total);
+  const avgScore=scored.length?scored.reduce((a,e)=>a+e.total,0)/scored.length:null;
+
+  const withOutcome=recent.filter(e=>e.outcome);
+  const wins=withOutcome.filter(e=>e.outcome==='win');
+  const losses=withOutcome.filter(e=>e.outcome==='loss');
+  const winRate=withOutcome.length?(wins.length/withOutcome.length*100):null;
+
+  const withPts=recent.filter(e=>e.actualPts!=null);
+  const avgHaul=withPts.length?withPts.reduce((a,e)=>a+e.actualPts,0)/withPts.length:null;
+
+  // heat score → R label for avg
+  const HEAT_R_NUM={5:0.4,4:1.0,3:1.5,2:2.5,1:3.5};
+  const withHeat=recent.filter(e=>e.scores&&e.scores.heat);
+  const avgHeat=withHeat.length?withHeat.reduce((a,e)=>a+HEAT_R_NUM[e.scores.heat],0)/withHeat.length:null;
+
+  // Heat Taken (MAE) — avg pts taken against
+  const withHeatTaken=recent.filter(e=>e.heatTaken&&e.heatTaken.pts!=null);
+  const avgHeatTakenPts=withHeatTaken.length?Math.round(withHeatTaken.reduce((a,e)=>a+e.heatTaken.pts,0)/withHeatTaken.length):null;
+  // Most common Heat Taken level
+  const htLevelCounts={};
+  recent.forEach(e=>{if(e.heatTaken&&e.heatTaken.level){htLevelCounts[e.heatTaken.level]=(htLevelCounts[e.heatTaken.level]||0)+1;}});
+  const topHeatLevel=Object.keys(htLevelCounts).sort((a,b)=>htLevelCounts[b]-htLevelCounts[a])[0]||null;
+
+  // Vault Yield (MFE) — avg % of available captured
+  const withVY=recent.filter(e=>e.vaultYield&&e.vaultYield.pct!=null);
+  const avgVaultYield=withVY.length?Math.round(withVY.reduce((a,e)=>a+e.vaultYield.pct,0)/withVY.length):null;
+
+  // ── verdict breakdown (with outcomes)
+  const vdGroups={};
+  VERDICTS.forEach(v=>{vdGroups[v.cls]={verdict:v,count:0,wins:0,withOutcome:0,totalPts:0,countPts:0};});
+  recent.forEach(e=>{
+    if(!e.verdict)return;
+    const g=vdGroups[e.verdict.cls];if(!g)return;
+    g.count++;
+    if(e.outcome){g.withOutcome++;if(e.outcome==='win')g.wins++;}
+    if(e.actualPts!=null){g.totalPts+=e.actualPts;g.countPts++;}
+  });
+  const maxVdCount=Math.max(1,...Object.values(vdGroups).map(g=>g.count));
+
+  // ── best crew type (by win rate among types with ≥2 outcomes)
+  let bestCrewType=null,bestWinRate=-1;
+  Object.values(vdGroups).forEach(g=>{
+    if(g.withOutcome>=2){const wr=g.wins/g.withOutcome;if(wr>bestWinRate){bestWinRate=wr;bestCrewType=g.verdict;}}
+  });
+
+  // ── most profitable hold
+  const holdBuckets={};
+  recent.forEach(e=>{
+    if(!e.expectedHold||e.actualPts==null)return;
+    if(!holdBuckets[e.expectedHold])holdBuckets[e.expectedHold]={total:0,count:0};
+    holdBuckets[e.expectedHold].total+=e.actualPts;
+    holdBuckets[e.expectedHold].count++;
+  });
+  let bestHold=null,bestHoldAvg=-Infinity;
+  Object.entries(holdBuckets).forEach(([h,b])=>{
+    if(b.count>=2&&b.total/b.count>bestHoldAvg){bestHoldAvg=b.total/b.count;bestHold=h;}
+  });
+
+  // ── weakest skill (lowest avg score per category)
+  const CAT_NAMES={prob:'Probability',eff:'Efficiency',heat:'Heat',dist:'Distance',comp:'Complexity'};
+  const catAvgs={};
+  CATS.forEach(k=>{
+    const vals=recent.filter(e=>e.scores&&e.scores[k]).map(e=>e.scores[k]);
+    catAvgs[k]=vals.length?vals.reduce((a,v)=>a+v,0)/vals.length:null;
+  });
+  let weakestCat=null,weakestVal=Infinity;
+  CATS.forEach(k=>{if(catAvgs[k]!=null&&catAvgs[k]<weakestVal){weakestVal=catAvgs[k];weakestCat=k;}});
+
+  // ── BUILD HTML
+  let html='';
+
+  // top stat cards — 2x3 grid
+  html+='<div class="ci-grid">';
+  html+='<div class="ci-card"><div class="ci-card-label">Avg Score</div><div class="ci-card-val">'+(avgScore!=null?avgScore.toFixed(1):'—')+'</div><div class="ci-card-sub">out of 25</div></div>';
+  html+='<div class="ci-card"><div class="ci-card-label">Win Rate</div><div class="ci-card-val">'+(winRate!=null?Math.round(winRate)+'%':'—')+'</div><div class="ci-card-sub">'+(withOutcome.length>0?wins.length+' of '+withOutcome.length+' trades':'no outcomes logged')+'</div></div>';
+  html+='<div class="ci-card"><div class="ci-card-label">Avg Haul</div><div class="ci-card-val">'+(avgHaul!=null?(avgHaul>=0?'+':'')+Math.round(avgHaul):'—')+'</div><div class="ci-card-sub">pts per trade</div></div>';
+  html+='<div class="ci-card"><div class="ci-card-label">Avg Heat</div><div class="ci-card-val">'+(avgHeat!=null?avgHeat.toFixed(1)+'R':'—')+'</div><div class="ci-card-sub">risk per trade</div></div>';
+  html+='<div class="ci-card"><div class="ci-card-label">🔥 Heat Taken</div>'
+    +'<div class="ci-card-val">'+(avgHeatTakenPts!=null?avgHeatTakenPts:'—')+'</div>'
+    +'<div class="ci-card-sub">'+(avgHeatTakenPts!=null?'avg pts against'+(topHeatLevel?' · '+topHeatLevel:''):'no MAE logged')+'</div></div>';
+  html+='<div class="ci-card"><div class="ci-card-label">🏦 Vault Yield</div>'
+    +'<div class="ci-card-val">'+(avgVaultYield!=null?avgVaultYield+'%':'—')+'</div>'
+    +'<div class="ci-card-sub">'+(avgVaultYield!=null?'avg captured · '+withVY.length+' trades':'no yield logged')+'</div></div>';
+  html+='</div>';
+
+  // best hold + weakest skill + vault yield
+  html+='<div class="ci-grid">';
+  html+='<div class="ci-card"><div class="ci-card-label">Best Hold Window</div><div class="ci-card-val" style="font-size:16px;margin-top:4px">'+(bestHold||'—')+'</div><div class="ci-card-sub">'+(bestHold?'avg '+(bestHoldAvg>=0?'+':'')+Math.round(bestHoldAvg)+' pts':'need 2+ per window')+'</div></div>';
+  html+='<div class="ci-card"><div class="ci-card-label">Weakest Skill</div><div class="ci-card-val" style="font-size:16px;margin-top:4px">'+(weakestCat?CAT_NAMES[weakestCat]:'—')+'</div><div class="ci-card-sub">'+(weakestCat?'avg '+catAvgs[weakestCat].toFixed(1)+'/5':'not enough data')+'</div></div>';
+  html+='<div class="ci-card"><div class="ci-card-label">🏦 Avg Vault Yield</div>'
+    +'<div class="ci-card-val" style="'+(avgVaultYield!=null?'color:'+(avgVaultYield>=80?'#97C459':avgVaultYield>=60?'var(--gold)':'var(--amber)'):'')+'">'+( avgVaultYield!=null?avgVaultYield+'%':'—')+'</div>'
+    +'<div class="ci-card-sub">'+(avgVaultYield!=null?'avg captured · '+withVY.length+' trades':'log Vault Yield to unlock')+'</div></div>';
+  if(bestCrewType){
+    html+='<div class="ci-card ci-full"><div class="ci-card-label">Best Crew Type</div><div style="display:flex;align-items:center;gap:10px;margin-top:4px"><span style="font-size:24px">'+bestCrewType.badge+'</span><div><div class="ci-card-val" style="font-size:18px">'+bestCrewType.title+'</div><div class="ci-card-sub">'+Math.round(bestWinRate*100)+'% win rate</div></div></div></div>';
+  }
+  html+='</div>';
+
+  // verdict breakdown
+  html+='<div class="card"><div class="card-head"><span class="card-icon">📊</span><span class="card-name">Heist Breakdown</span></div>';
+  VERDICTS.forEach(v=>{
+    const g=vdGroups[v.cls];if(!g.count)return;
+    const pct=Math.round(g.count/recent.length*100);
+    const barW=Math.round(g.count/maxVdCount*100);
+    const avgPts=g.countPts?Math.round(g.totalPts/g.countPts):null;
+    const vWinRate=g.withOutcome?Math.round(g.wins/g.withOutcome*100):null;
+    html+='<div class="ci-vd-row">'
+      +'<div class="ci-vd-badge">'+v.badge+'</div>'
+      +'<div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+      +'<span class="ci-vd-name">'+v.title+'</span>'
+      +'<span class="ci-vd-count">'+g.count+'</span>'
+      +'<div class="ci-vd-bar-wrap"><div class="ci-vd-bar" style="width:'+barW+'%"></div></div>'
+      +'<span class="ci-vd-pct">'+pct+'%</span>'
+      +'</div>'
+      +'<div style="display:flex;gap:12px">'
+      +(vWinRate!=null?'<span style="font-size:10px;color:var(--txt3)">Win rate <span style="color:#97C459;font-weight:600">'+vWinRate+'%</span></span>':'')
+      +(avgPts!=null?'<span style="font-size:10px;color:var(--txt3)">Avg haul <span style="color:var(--gold);font-weight:600">'+(avgPts>=0?'+':'')+avgPts+' pts</span></span>':'')
+      +'</div></div></div>';
+  });
+  html+='</div>';
+
+  // skill calibration
+  html+='<div class="card"><div class="card-head"><span class="card-icon">🎯</span><span class="card-name">Skill Calibration</span></div><div class="card-sub">Your average score per category — 5 is elite</div>';
+  CATS.forEach(k=>{
+    const avg=catAvgs[k];
+    const barW=avg!=null?Math.round(avg/5*100):0;
+    const color=avg>=4?'#97C459':avg>=3?'var(--gold)':avg>=2?'var(--amber)':'var(--red)';
+    html+='<div class="ci-cat-row">'
+      +'<div class="ci-cat-name">'+CAT_NAMES[k]+'</div>'
+      +'<div class="ci-cat-bar-wrap"><div class="ci-cat-bar" style="width:'+barW+'%;background:'+color+'"></div></div>'
+      +'<div class="ci-cat-val">'+(avg!=null?avg.toFixed(1):'—')+'</div>'
+      +'</div>';
+  });
+  html+='</div>';
+
+  body.innerHTML=html;
+}
+
+/* ── TOAST ── */
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+loadForDate(todayStr());
+</script>
+</body>
+</html>
