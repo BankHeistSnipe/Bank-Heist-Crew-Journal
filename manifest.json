@@ -1,0 +1,15 @@
+{
+  "name": "Heist Metrics",
+  "short_name": "Heist Metrics",
+  "start_url": "/Bank-Heist-Crew-Journal/heist-metrics.html",
+  "display": "standalone",
+  "background_color": "#080D1A",
+  "theme_color": "#080D1A",
+  "icons": [
+    {
+      "src": "/Bank-Heist-Crew-Journal/BHC Logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
