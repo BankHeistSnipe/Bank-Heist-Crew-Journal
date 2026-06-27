@@ -733,6 +733,7 @@ const HEAT_COLORS=['','#8B0000','#E24B4A','#EF9F27','#C9A84C','#639922'];
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function dayName(ds){return new Date(ds+'T12:00:00').toLocaleDateString('en-US',{weekday:'long'});}
 function fmtDate(ds){return new Date(ds+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function fmtTs(iso){if(!iso)return'';const d=new Date(iso);return d.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit',timeZone:'America/Los_Angeles'})+' '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/Los_Angeles'});}
 function getWeekDates(off){
   const t=new Date();const dow=t.getDay();const m=new Date(t);
   m.setDate(t.getDate()-(dow===0?6:dow-1)+off*7);
@@ -1158,7 +1159,7 @@ function updateVaultYieldPct(){
     el.style.color='var(--gold)';
   }
 }
-function saveEntry(){
+function saveEntry(editKey){
   const dateKey=picker.value;
   const total=CATS.reduce((a,k)=>a+scores[k],0);
   const allFilled=CATS.every(k=>scores[k]>0);
@@ -1170,6 +1171,11 @@ function saveEntry(){
   showMkts.forEach(m=>{haul[m]=d?DIST_PTS[d][m]:null;});
   haul.holdTime=e?EFF_TIME[e]:null;
   haul.heat=h?HEAT_R[h]:null;
+  const now=new Date().toISOString();
+  const all=getAllEntries();
+  // If editing, preserve original savedAt and delete old key
+  const origSavedAt=editKey&&all[editKey]?all[editKey].savedAt:null;
+  if(editKey&&all[editKey])delete all[editKey];
   const entry={
     date:dateKey,day:dayName(dateKey),
     market:Object.keys(mkt).filter(k=>mkt[k]),
@@ -1190,12 +1196,12 @@ function saveEntry(){
     heatTaken:{pts:getHeatTakenPts(), level:getHeatTakenLevel()},
     vaultYield:{collected:getActualPts(), available:getVyAvailable(),
       pct:(getActualPts()!=null&&getVyAvailable()>0)?Math.round(getActualPts()/getVyAvailable()*100):null},
-    savedAt:new Date().toISOString()
+    savedAt:origSavedAt||now,
+    editedAt:origSavedAt?now:null
   };
-  const all=getAllEntries();
   all['hm_'+dateKey+'_'+Date.now()]=entry;
   localStorage.setItem('bhc_heist_metrics',JSON.stringify(all));
-  showToast('Saved — '+entry.day+' '+fmtDate(dateKey));
+  showToast(editKey?'Updated — '+entry.day+' '+fmtDate(dateKey):'Saved — '+entry.day+' '+fmtDate(dateKey));
 }
 
 function getAllEntries(){try{return JSON.parse(localStorage.getItem('bhc_heist_metrics')||'{}');}catch(e){return {};}}
@@ -1315,10 +1321,11 @@ function renderHistory(){
     const vStyle=vd?getVerdictStyle(vd.cls):'';
     const haulStr=e.haul?(Object.entries(e.haul).filter(([k,v])=>k!=='holdTime'&&k!=='heat'&&v).map(([k,v])=>k+': '+v+' pts').join(' · ')):'';
     const holdStr=e.expectedHold?' · Hold: '+e.expectedHold:'';
+    const tsHtml=e.savedAt?'<div style="font-size:10px;color:var(--txt3);margin-top:3px;line-height:1.7">Logged '+fmtTs(e.savedAt)+(e.editedAt?'&nbsp;·&nbsp;Edited '+fmtTs(e.editedAt):'')+'</div>':'';
     return '<div class="hist-card" onclick="loadHistEntry(\''+key+'\')">'
-      +'<div class="hist-row"><div><div class="hist-day">'+e.day+'</div><div class="hist-date">'+fmtDate(e.date)+(e.session?' · '+e.session:'')+'</div></div>'
+      +'<div class="hist-row"><div><div class="hist-day">'+e.day+'</div><div class="hist-date">'+fmtDate(e.date)+(e.session?' · '+e.session:'')+'</div>'+tsHtml+'</div>'
       +'<div style="display:flex;align-items:center">'+(e.total?'<span class="hist-total">'+e.total+'<span style="font-size:12px;color:var(--txt3)">/25</span></span>':'<span style="font-size:12px;color:var(--txt3)">Incomplete</span>')
-      +'<span class="hist-delete" onclick="event.stopPropagation();deleteEntry(\''+key+'\')">×</span></div></div>'
+      +'<span class="hist-delete" onclick="event.stopPropagation();openEntryMenu(\''+key+'\')">⋯</span></div></div>'
       +(e.setup?'<div class="hist-setup">"'+e.setup+'"'+(e.marketChar?' · '+e.marketChar:'')+'</div>':'')
       +(haulStr||holdStr?'<div style="font-size:11px;color:var(--txt3);margin-bottom:6px">'+(haulStr||'')+holdStr+'</div>':'')
       +'<div class="hist-chips">'+mktStr+(vd?'<span class="wdc-verdict-pill" style="'+vStyle+'">'+vd.badge+' '+vd.title+'</span>':'')
@@ -1339,11 +1346,52 @@ function loadHistEntry(key){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-score').classList.add('active');
 }
+
+// ── ENTRY MENU (edit / delete) ──
+let _pendingEntryKey=null;
+let _pendingEntryAction=null;
+
+function openEntryMenu(key){
+  _pendingEntryKey=key;
+  _pendingEntryAction=null;
+  // Reset auth modal for entry actions
+  const inp=document.getElementById('auth-input');
+  const fb=document.getElementById('auth-feedback');
+  inp.value='';inp.classList.remove('auth-error');
+  fb.textContent='';fb.className='auth-feedback';
+  // Show entry action modal instead of direct auth
+  document.getElementById('entry-menu-modal').classList.add('open');
+}
+
+function selectEntryAction(action){
+  _pendingEntryAction=action;
+  document.getElementById('entry-menu-modal').classList.remove('open');
+  // Now open auth
+  const inp=document.getElementById('auth-input');
+  const fb=document.getElementById('auth-feedback');
+  inp.value='';inp.classList.remove('auth-error');
+  fb.textContent='';fb.className='auth-feedback';
+  document.getElementById('auth-modal').classList.add('open');
+  setTimeout(()=>inp.focus(),300);
+}
+
 function deleteEntry(key){
-  if(!confirm('Delete this entry?'))return;
   const all=getAllEntries();delete all[key];
   localStorage.setItem('bhc_heist_metrics',JSON.stringify(all));
   renderHistory();renderWeek();
+}
+
+function editEntry(key){
+  document.getElementById('entry-confirm-modal').classList.add('open');
+  document.getElementById('entry-confirm-action').textContent='load this entry into the scorecard for editing';
+  document.getElementById('entry-confirm-btn').onclick=function(){
+    document.getElementById('entry-confirm-modal').classList.remove('open');
+    // Store the edit key so saveEntry knows this is an edit
+    window._editingKey=key;
+    loadHistEntry(key);
+    // Patch save button to pass key
+    document.querySelector('.save-btn').onclick=function(){openAuthModal('edit');};
+  };
 }
 
 /* ── WEEK VIEW ── */
@@ -1707,7 +1755,7 @@ loadForDate(todayStr());
 <script>
 const AUTH_CODE='2026admin';
 
-function openAuthModal(){
+function openAuthModal(context){
   const m=document.getElementById('auth-modal');
   const inp=document.getElementById('auth-input');
   const fb=document.getElementById('auth-feedback');
@@ -1723,11 +1771,29 @@ function submitAuth(){
   const inp=document.getElementById('auth-input');
   const fb=document.getElementById('auth-feedback');
   if(inp.value===AUTH_CODE){
-    fb.textContent='✅ Intel Secured — logging heist...';
+    fb.textContent='✅ Intel Secured...';
     fb.className='auth-feedback success';
     setTimeout(()=>{
       document.getElementById('auth-modal').classList.remove('open');
-      saveEntry();
+      if(_pendingEntryAction==='delete'){
+        const k=_pendingEntryKey;
+        document.getElementById('entry-confirm-modal').classList.add('open');
+        document.getElementById('entry-confirm-action').textContent='permanently delete this entry — this cannot be undone';
+        document.getElementById('entry-confirm-btn').onclick=function(){
+          document.getElementById('entry-confirm-modal').classList.remove('open');
+          deleteEntry(k);
+        };
+      }else if(_pendingEntryAction==='edit'){
+        editEntry(_pendingEntryKey);
+      }else{
+        // Normal save — pass edit key if we're in edit mode
+        const ek=window._editingKey||null;
+        window._editingKey=null;
+        // Restore save button to normal
+        document.querySelector('.save-btn').onclick=function(){openAuthModal();};
+        saveEntry(ek);
+      }
+      _pendingEntryKey=null;_pendingEntryAction=null;
     },800);
   }else{
     inp.classList.add('auth-error');
@@ -1738,6 +1804,40 @@ function submitAuth(){
   }
 }
 </script>
+
+<!-- ═══ ENTRY MENU MODAL ═══ -->
+<div class="setup-modal-overlay" id="entry-menu-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="setup-modal">
+    <div class="setup-modal-handle"></div>
+    <div style="text-align:center;font-size:24px;margin-bottom:8px">🗂️</div>
+    <div class="setup-modal-title" style="text-align:center">Manage Entry</div>
+    <div style="font-size:13px;color:var(--txt2);text-align:center;margin-bottom:18px">What would you like to do with this heist?</div>
+    <button onclick="selectEntryAction('edit')" style="width:100%;background:var(--navy4);border:0.5px solid var(--gold-border);color:var(--txt);font-size:14px;font-weight:700;border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;text-align:left">
+      ✏️ &nbsp;Edit Entry<div style="font-size:11px;color:var(--txt3);font-weight:400;margin-top:3px">Load into scorecard to modify and re-save</div>
+    </button>
+    <button onclick="selectEntryAction('delete')" style="width:100%;background:var(--red-bg);border:0.5px solid rgba(226,75,74,0.4);color:var(--red);font-size:14px;font-weight:700;border-radius:12px;padding:14px;cursor:pointer;text-align:left">
+      🗑️ &nbsp;Delete Entry<div style="font-size:11px;color:rgba(226,75,74,0.6);font-weight:400;margin-top:3px">Permanently remove from the vault</div>
+    </button>
+  </div>
+</div>
+
+<!-- ═══ ENTRY CONFIRM MODAL ═══ -->
+<div class="setup-modal-overlay" id="entry-confirm-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="setup-modal">
+    <div class="setup-modal-handle"></div>
+    <div style="text-align:center;font-size:24px;margin-bottom:8px">⚠️</div>
+    <div class="setup-modal-title" style="text-align:center">Confirm Action</div>
+    <div style="font-size:13px;color:var(--txt2);text-align:center;margin-bottom:18px;line-height:1.6">
+      You're about to <span id="entry-confirm-action">proceed</span>.
+    </div>
+    <button id="entry-confirm-btn" style="width:100%;background:var(--gold);color:var(--navy);font-size:14px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;border:none;border-radius:12px;padding:14px;cursor:pointer;margin-bottom:10px">
+      Confirm
+    </button>
+    <button onclick="document.getElementById('entry-confirm-modal').classList.remove('open')" style="width:100%;background:none;border:0.5px solid var(--gold-border);color:var(--txt2);font-size:13px;border-radius:12px;padding:12px;cursor:pointer">
+      Cancel
+    </button>
+  </div>
+</div>
 
 </body>
 </html>
