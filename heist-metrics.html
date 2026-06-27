@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Heist Metrics">
-<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/BankHeistSnipe/Bank-Heist-Crew-Journal/main/BHCLogo.png">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/BankHeistSnipe/Bank-Heist-Crew-Journal/main/BHC%20Logo.png">
 <title>Heist Metrics — BHC</title>
 <style>
 :root{
@@ -81,7 +81,7 @@ html,body{min-height:100%;background:var(--navy);color:var(--txt);font-family:-a
 .field-row{margin-bottom:11px}
 .mkt-row{display:flex;gap:8px}
 .mkt-btn{flex:1;padding:8px 0;border-radius:8px;border:1px solid var(--gold-border);font-size:13px;font-weight:600;cursor:pointer;background:var(--navy4);color:var(--txt3);transition:all .12s;letter-spacing:0.06em;font-family:inherit}
-.mkt-btn.active{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.mkt-btn.active{background:var(--gold);color:var(--navy);border-color:var(--gold);box-shadow:0 0 12px rgba(201,168,76,0.55),0 0 24px rgba(201,168,76,0.2)}
 .setup-select{width:100%;border:0.5px solid var(--gold-border);border-radius:8px;padding:9px 12px;font-size:13px;background:var(--navy4);color:var(--txt);font-family:inherit;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A84C' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
 .setup-text-input{width:100%;border:0.5px solid var(--gold-border);border-radius:8px;padding:9px 12px;font-size:13px;background:var(--navy4);color:var(--txt);font-family:inherit;outline:none;margin-top:6px}
 .setup-text-input:focus{border-color:var(--gold)}
@@ -131,6 +131,15 @@ html,body{min-height:100%;background:var(--navy);color:var(--txt);font-family:-a
 .hold-chip input{display:none}
 .hold-chip.sel{border-color:var(--gold);color:var(--gold);background:var(--gold-dim);font-weight:600}
 
+/* SCORE PANEL ghost bar */
+.sp-ghost-bar{display:flex;gap:3px;justify-content:center;margin:6px 0 4px}
+.sp-ghost-seg{height:4px;width:18px;border-radius:2px;background:rgba(201,168,76,0.12)}
+/* dossier match bar */
+.dossier-bar-wrap{height:5px;background:var(--navy4);border-radius:3px;overflow:hidden;flex:1}
+.dossier-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),#E2C96A)}
+/* dossier context line */
+.dossier-ctx{font-size:10px;color:var(--txt3);text-align:center;letter-spacing:0.04em;margin-top:10px;padding-top:10px;border-top:0.5px solid rgba(201,168,76,0.1)}
+
 /* EXPECTED HAUL */
 .haul-card{background:var(--navy3);border:1px solid var(--gold);border-radius:12px;padding:16px;margin-bottom:12px}
 .haul-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
@@ -143,6 +152,18 @@ html,body{min-height:100%;background:var(--navy);color:var(--txt);font-family:-a
 .haul-cell-unit{font-size:11px;color:var(--txt2);margin-top:3px}
 .haul-cell-sub{font-size:11px;color:var(--txt2);margin-top:3px}
 .haul-empty{text-align:center;font-size:12px;color:var(--txt3);font-style:italic;padding:8px 0}
+/* confidence dot */
+.conf-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;position:relative}
+.conf-dot::after{content:'';position:absolute;inset:-3px;border-radius:50%;opacity:0.5;animation:dotpulse 2s ease-in-out infinite}
+.conf-dot-pending{background:var(--txt3)}
+.conf-dot-estimated{background:var(--amber)}
+.conf-dot-estimated::after{background:var(--amber);animation:dotpulse 1.8s ease-in-out infinite}
+.conf-dot-calibrated{background:#97C459}
+.conf-dot-calibrated::after{background:#97C459;animation:dotpulse 2.4s ease-in-out infinite}
+@keyframes dotpulse{0%,100%{transform:scale(1);opacity:0.4}50%{transform:scale(2.2);opacity:0}}
+/* big haul number */
+.haul-big-num{font-size:58px;font-weight:800;color:var(--gold);line-height:1;letter-spacing:-3px;text-shadow:0 0 24px rgba(201,168,76,0.45),0 0 48px rgba(201,168,76,0.15)}
+.haul-big-num.haul-num-dim{color:var(--txt3);text-shadow:none}
 
 /* WEAKEST VAULT TEST */
 .weakest-vault{background:var(--navy3);border:1px solid var(--gold);border-radius:12px;padding:16px;margin-bottom:12px}
@@ -162,6 +183,22 @@ html,body{min-height:100%;background:var(--navy);color:var(--txt);font-family:-a
 .vr-status-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:6px}
 .vr-status-word{font-size:36px;font-weight:800;letter-spacing:0.06em;line-height:1;margin-bottom:4px}
 .vr-status-sub{font-size:12px;font-weight:500;opacity:0.8;line-height:1.4}
+
+/* SETUP INFO MODAL */
+.setup-info-btn{background:none;border:none;cursor:pointer;font-size:13px;color:var(--txt3);padding:0 0 0 5px;line-height:1;vertical-align:middle;transition:color .15s}
+.setup-info-btn:active{color:var(--gold)}
+.setup-modal-overlay{position:fixed;inset:0;background:rgba(8,13,26,0.82);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.setup-modal-overlay.open{opacity:1;pointer-events:all}
+.setup-modal{background:var(--navy2);border:0.5px solid var(--gold-border);border-radius:18px 18px 0 0;padding:20px 18px calc(32px + env(safe-area-inset-bottom,0px));width:100%;max-width:480px;transform:translateY(20px);transition:transform .22s;max-height:82vh;overflow-y:auto}
+.setup-modal-overlay.open .setup-modal{transform:translateY(0)}
+.setup-modal-handle{width:36px;height:4px;background:var(--gold-border);border-radius:2px;margin:0 auto 18px}
+.setup-modal-title{font-size:13px;font-weight:700;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px}
+.setup-def{padding:14px 0;border-bottom:0.5px solid rgba(201,168,76,0.1)}
+.setup-def:last-child{border-bottom:none}
+.setup-def-head{display:flex;align-items:baseline;gap:7px;margin-bottom:6px}
+.setup-def-name{font-size:14px;font-weight:700;color:var(--gold)}
+.setup-def-sub{font-size:11px;color:var(--txt3);font-style:italic}
+.setup-def-body{font-size:12px;color:var(--txt2);line-height:1.6}
 
 /* ACTIONS */
 .action-row{display:flex;gap:8px;margin-bottom:12px}
@@ -233,6 +270,26 @@ html,body{min-height:100%;background:var(--navy);color:var(--txt);font-family:-a
 .ci-card-label{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
 .ci-card-val{font-size:28px;font-weight:700;color:var(--gold);line-height:1;margin-bottom:2px}
 .ci-card-sub{font-size:10px;color:var(--txt2)}
+
+/* MOST PROFITABLE ROBBERY card */
+.mpr-card{background:var(--navy2);border:1px solid var(--gold);border-radius:14px;padding:18px;margin-bottom:12px;position:relative;overflow:hidden}
+.mpr-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(201,168,76,0.08) 0%,transparent 65%);pointer-events:none}
+.mpr-eyebrow{font-size:9px;font-weight:800;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:10px}
+.mpr-setup{font-size:20px;font-weight:800;color:var(--txt);margin-bottom:4px;line-height:1.2}
+.mpr-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.mpr-tag{font-size:10px;font-weight:600;color:var(--gold);background:rgba(201,168,76,0.12);border:0.5px solid var(--gold-border);border-radius:5px;padding:3px 8px;letter-spacing:0.04em}
+.mpr-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.mpr-stat{background:var(--navy4);border:0.5px solid var(--gold-border);border-radius:10px;padding:10px 12px;text-align:center}
+.mpr-stat-val{font-size:22px;font-weight:700;color:var(--gold);line-height:1}
+.mpr-stat-lbl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px}
+.mpr-stab{display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;color:var(--txt3);margin-top:4px}
+/* crew leak card */
+.leak-card{background:rgba(226,75,74,0.06);border:0.5px solid rgba(226,75,74,0.3);border-radius:12px;padding:14px;margin-bottom:12px}
+.leak-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.leak-icon{font-size:16px}
+.leak-title{font-size:11px;font-weight:800;color:var(--red);letter-spacing:0.12em;text-transform:uppercase}
+.leak-body{font-size:13px;color:var(--txt2);line-height:1.6}
+.leak-body strong{color:var(--txt);font-weight:700}
 
 /* verdict breakdown */
 .ci-vd-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid rgba(201,168,76,0.1)}
@@ -324,6 +381,13 @@ h2.print-title{display:none}
 <div class="score-panel">
   <div class="sp-hero" id="sp-status">
     <div class="sp-status-eyebrow" id="sp-status-eyebrow" style="color:var(--txt3)">Mission Unscored</div>
+    <!-- ghost bar — visible only when unscored -->
+    <div class="sp-ghost-bar" id="sp-ghost-bar">
+      <div class="sp-ghost-seg"></div><div class="sp-ghost-seg"></div><div class="sp-ghost-seg"></div>
+      <div class="sp-ghost-seg"></div><div class="sp-ghost-seg"></div><div class="sp-ghost-seg"></div>
+      <div class="sp-ghost-seg"></div><div class="sp-ghost-seg"></div><div class="sp-ghost-seg"></div>
+      <div class="sp-ghost-seg"></div><div class="sp-ghost-seg"></div><div class="sp-ghost-seg"></div>
+    </div>
     <!-- GO / STAND DOWN chip -->
     <div class="sp-go-chip" id="sp-go-chip" style="display:none">
       <span class="sp-go-dot" id="sp-go-dot"></span>
@@ -362,14 +426,7 @@ h2.print-title{display:none}
   <div class="vault-section">
     <div class="vault-section-head"><span class="vault-section-icon">&#127919;</span><span class="vault-section-name">Target Vault</span></div>
     <div class="field-row">
-      <div class="field-label">Market</div>
-      <div class="mkt-row">
-        <button class="mkt-btn" id="mkt-ym" onclick="toggleMkt('YM')">YM</button>
-        <button class="mkt-btn" id="mkt-nq" onclick="toggleMkt('NQ')">NQ</button>
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field-label">Setup</div>
+      <div class="field-label">Setup <button class="setup-info-btn" onclick="document.getElementById('setup-modal').classList.add('open')" aria-label="Setup definitions">ℹ️</button></div>
       <select class="setup-select" id="setup-select" onchange="syncSetupDropdown()">
         <option value="">Select setup&#8230;</option>
         <option>🏦 Inside Job (Failed Reclaim)</option>
@@ -382,15 +439,22 @@ h2.print-title{display:none}
       <input type="text" class="setup-text-input" id="setup-custom" placeholder="Describe setup&#8230;" style="display:none">
     </div>
     <div class="field-row">
+      <div class="field-label">Market</div>
+      <div class="mkt-row">
+        <button class="mkt-btn" id="mkt-ym" onclick="toggleMkt('YM')">🏦 YM Vault</button>
+        <button class="mkt-btn" id="mkt-nq" onclick="toggleMkt('NQ')">🏦 NQ Vault</button>
+      </div>
+    </div>
+    <div class="field-row">
       <div class="field-label">Session</div>
       <div class="radio-row" id="session-group">
-        <label class="radio-chip" id="rc-tok"><input type="radio" name="session" value="Tokyo" onchange="syncRadio('session-group','rc-tok')"> Tokyo</label>
-        <label class="radio-chip" id="rc-lon"><input type="radio" name="session" value="London" onchange="syncRadio('session-group','rc-lon')"> London</label>
-        <label class="radio-chip" id="rc-ny"><input type="radio" name="session" value="NY" onchange="syncRadio('session-group','rc-ny')"> NY</label>
+        <label class="radio-chip" id="rc-tok"><input type="radio" name="session" value="Tokyo" onchange="syncRadio('session-group','rc-tok')"> 🌏 Tokyo</label>
+        <label class="radio-chip" id="rc-lon"><input type="radio" name="session" value="London" onchange="syncRadio('session-group','rc-lon')"> 🇬🇧 London</label>
+        <label class="radio-chip" id="rc-ny"><input type="radio" name="session" value="NY" onchange="syncRadio('session-group','rc-ny')"> 🗽 NY</label>
       </div>
     </div>
     <div class="field-row" style="margin-bottom:0">
-      <div class="field-label">Market Character</div>
+      <div class="field-label">🌊 Tape</div>
       <div class="radio-row" id="char-group">
         <label class="radio-chip" id="rc-exp"><input type="radio" name="mchar" value="Expansion" onchange="syncRadio('char-group','rc-exp')"> Expansion</label>
         <label class="radio-chip" id="rc-dis"><input type="radio" name="mchar" value="Distribution" onchange="syncRadio('char-group','rc-dis')"> Distribution</label>
@@ -405,18 +469,18 @@ h2.print-title{display:none}
     <div class="card-head"><span class="card-icon">&#127919;</span><span class="card-name">Probability</span></div>
     <div class="card-sub">How likely is this setup to work?</div>
     <div class="factors">
-      <label class="factor" id="fl-htf"><input type="checkbox" id="f-htf" onchange="syncFactor(this,'fl-htf')"> HTF Alignment</label>
-      <label class="factor" id="fl-loc"><input type="checkbox" id="f-loc" onchange="syncFactor(this,'fl-loc')"> Location</label>
-      <label class="factor" id="fl-ses"><input type="checkbox" id="f-ses" onchange="syncFactor(this,'fl-ses')"> Session</label>
-      <label class="factor" id="fl-mkt"><input type="checkbox" id="f-mkt" onchange="syncFactor(this,'fl-mkt')"> Market Character</label>
-      <label class="factor" id="fl-inv"><input type="checkbox" id="f-inv" onchange="syncFactor(this,'fl-inv')"> Inventory</label>
+      <label class="factor" id="fl-htf"><input type="checkbox" id="f-htf" onchange="syncFactor(this,'fl-htf')"> 📋 Blueprint</label>
+      <label class="factor" id="fl-loc"><input type="checkbox" id="f-loc" onchange="syncFactor(this,'fl-loc')"> 📍 Location</label>
+      <label class="factor" id="fl-ses"><input type="checkbox" id="f-ses" onchange="syncFactor(this,'fl-ses')"> 🕒 Timing</label>
+      <label class="factor" id="fl-mkt"><input type="checkbox" id="f-mkt" onchange="syncFactor(this,'fl-mkt')"> 🌊 Tape</label>
+      <label class="factor" id="fl-inv"><input type="checkbox" id="f-inv" onchange="syncFactor(this,'fl-inv')"> 📦 Inventory</label>
     </div>
     <div class="star-row" id="s-prob">
-      <div class="star-opt" onclick="setScore('prob',5)" data-val="5"><span class="star-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="star-label">75%+</span><span class="star-descriptor">Very likely</span></div>
-      <div class="star-opt" onclick="setScore('prob',4)" data-val="4"><span class="star-stars">&#9733;&#9733;&#9733;&#9733;</span><span class="star-label">65&#8211;75%</span></div>
-      <div class="star-opt" onclick="setScore('prob',3)" data-val="3"><span class="star-stars">&#9733;&#9733;&#9733;</span><span class="star-label">55&#8211;65%</span></div>
-      <div class="star-opt" onclick="setScore('prob',2)" data-val="2"><span class="star-stars">&#9733;&#9733;</span><span class="star-label">Below 55%</span></div>
-      <div class="star-opt" onclick="setScore('prob',1)" data-val="1"><span class="star-stars">&#9733;</span><span class="star-label">Low probability</span></div>
+      <div class="star-opt" onclick="setScore('prob',5)" data-val="5"><span class="star-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="star-label">Weakest Vault</span><span class="star-descriptor">75%+ · All green</span></div>
+      <div class="star-opt" onclick="setScore('prob',4)" data-val="4"><span class="star-stars">&#9733;&#9733;&#9733;&#9733;</span><span class="star-label">Solid Intel</span><span class="star-descriptor">65–75% · Solid read</span></div>
+      <div class="star-opt" onclick="setScore('prob',3)" data-val="3"><span class="star-stars">&#9733;&#9733;&#9733;</span><span class="star-label">Manageable Risk</span><span class="star-descriptor">55–65% · Proceed with caution</span></div>
+      <div class="star-opt" onclick="setScore('prob',2)" data-val="2"><span class="star-stars">&#9733;&#9733;</span><span class="star-label">Crew Exposed</span><span class="star-descriptor">Below 55% · Proceed with caution.</span></div>
+      <div class="star-opt" onclick="setScore('prob',1)" data-val="1"><span class="star-stars">&#9733;</span><span class="star-label">Abort Mission</span><span class="star-descriptor">Low probability · Walk away.</span></div>
     </div>
     <textarea class="notes-ta" id="n-prob" placeholder="Notes&#8230;"></textarea>
   </div>
@@ -729,11 +793,13 @@ function updatePanel(){
   });
   const heroEl=document.getElementById('sp-status');
   const eyebrowEl=document.getElementById('sp-status-eyebrow');
+  const ghostBar=document.getElementById('sp-ghost-bar');
   const chipEl=document.getElementById('sp-go-chip');
   const dotEl=document.getElementById('sp-go-dot');
   const wordEl=document.getElementById('sp-go-word');
   const classEl=document.getElementById('sp-status-class');
   if(allFilled){
+    ghostBar.style.display='none';
     const vd=getVerdict(total);
     const isGo=total>=18;
     heroEl.className='sp-hero '+(isGo?'sp-status-go':'sp-status-standdown');
@@ -751,6 +817,7 @@ function updatePanel(){
     heroEl.className='sp-hero';
     eyebrowEl.textContent='Mission Unscored';
     eyebrowEl.style.color='var(--txt3)';
+    ghostBar.style.display='flex';
     chipEl.style.display='none';
     classEl.style.display='none';
   }
@@ -887,48 +954,90 @@ function updateHaul(){
         +'</div>';
       html+=_targetProfile(vd,activeMkts,hold,total);
     }else{
-      // ── ESTIMATED / CALIBRATED ──
-      // State header
-      html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
-        +'<span style="font-size:20px">'+dot+'</span>'
-        +'<div>'
-        +'<div style="font-size:15px;font-weight:700;color:'+dotColor+'">'+label+'</div>'
-        +'<div style="font-size:10px;color:var(--txt3);margin-top:1px">'+stabDot+' '+stabLabel+' · '+totalMatches+' heists'+(spanStr&&spanStr!=='single session'?' · '+spanStr:'')+'</div>'
+      // ── ESTIMATED / CALIBRATED — DOSSIER VIEW ──
+
+      // Vault yield from similar heists
+      const withVY=withPts.filter(r=>r.entry.vaultYield&&r.entry.vaultYield.pct!=null);
+      const avgVY=withVY.length?Math.round(withVY.reduce((a,r)=>a+r.entry.vaultYield.pct,0)/withVY.length):null;
+
+      // ── Row 1: animated dot + stab label + match confidence
+      const dotCls=state==='calibrated'?'conf-dot-calibrated':'conf-dot-estimated';
+      html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+        +'<div class="conf-dot '+dotCls+'"></div>'
+        +'<div style="flex:1">'
+        +'<div style="font-size:11px;font-weight:800;color:'+dotColor+';letter-spacing:0.14em;text-transform:uppercase">'+stabLabel+'</div>'
+        +'<div style="font-size:10px;color:var(--txt3);margin-top:2px">'+avgSim+'% Match Confidence · '+totalMatches+' heists</div>'
         +'</div>'
         +'</div>';
 
-      // Big pts
-      html+='<div style="text-align:center;margin-bottom:14px">'
-        +'<div style="font-size:44px;font-weight:700;color:var(--gold);line-height:1;letter-spacing:-2px">'+(avgPts!=null?(avgPts>=0?'+':'')+avgPts:'—')+'</div>'
-        +'<div style="font-size:12px;color:var(--txt3);margin-top:3px">pts</div>'
+      // ── Row 2: big pts number
+      const numCls=avgPts!=null?'haul-big-num':'haul-big-num haul-num-dim';
+      html+='<div style="text-align:center;margin-bottom:10px">'
+        +'<div class="'+numCls+'">'+(avgPts!=null?(avgPts>=0?'+':'')+avgPts:'—')+'</div>'
+        +'<div style="font-size:11px;color:var(--txt3);margin-top:2px;letter-spacing:0.06em;text-transform:uppercase">Expected Pts</div>'
         +'</div>';
 
-      // Stat strip — WR · Heat · Matches
-      const sc=(lbl,val,col)=>'<div style="flex:1;text-align:center;padding:8px 4px;border-right:0.5px solid rgba(201,168,76,0.1)">'
-        +'<div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">'+lbl+'</div>'
-        +'<div style="font-size:16px;font-weight:700;color:'+(col||'var(--gold)')+'">'+val+'</div>'
+      // ── Row 3: match confidence bar
+      html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">'
+        +'<div class="dossier-bar-wrap"><div class="dossier-bar-fill" style="width:'+avgSim+'%"></div></div>'
+        +'<div style="font-size:11px;font-weight:700;color:var(--gold);white-space:nowrap;min-width:32px;text-align:right">'+avgSim+'%</div>'
         +'</div>';
+
+      // ── Row 4: stat pills — WR · Vault Yield · Matches
+      const pill=(lbl,val,col)=>'<div style="flex:1;text-align:center;padding:8px 4px;border-right:0.5px solid rgba(201,168,76,0.1)">'
+        +'<div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">'+lbl+'</div>'
+        +'<div style="font-size:15px;font-weight:700;color:'+(col||'var(--gold)')+'">'+val+'</div>'
+        +'</div>';
+      const wrCol=winRate!=null?(winRate>=70?'#97C459':winRate>=50?'var(--gold)':'#E24B4A'):'var(--txt3)';
       html+='<div style="display:flex;border:0.5px solid rgba(201,168,76,0.2);border-radius:10px;overflow:hidden;margin-bottom:12px">'
-        +sc('Win Rate', winRate!=null?winRate+'%':'—', winRate!=null?(winRate>=70?'#97C459':winRate>=50?'var(--gold)':'#E24B4A'):'var(--txt3)')
-        +sc('Avg Heat', avgHeatR||'—', null)
+        +pill('Win Rate', winRate!=null?winRate+'%':'—', wrCol)
+        +pill('Vault Yield', avgVY!=null?avgVY+'%':'—', avgVY!=null?(avgVY>=80?'#97C459':avgVY>=60?'var(--gold)':'var(--amber)'):null)
         +'<div style="flex:1;text-align:center;padding:8px 4px">'
         +'<div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Matches</div>'
-        +'<div style="font-size:16px;font-weight:700;color:var(--gold)">'+n+'</div>'
+        +'<div style="font-size:15px;font-weight:700;color:var(--gold)">'+n+'</div>'
         +'</div>'
         +'</div>';
 
-      // Similarity bar
-      html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">'
-        +'<div style="font-size:10px;color:var(--txt3);white-space:nowrap;width:60px">Similarity</div>'
-        +'<div style="flex:1;height:3px;background:var(--navy4);border-radius:2px;overflow:hidden"><div style="width:'+avgSim+'%;height:100%;background:var(--gold);border-radius:2px"></div></div>'
-        +'<div style="font-size:11px;font-weight:700;color:var(--gold);white-space:nowrap">'+avgSim+'%</div>'
-        +'</div>';
+      // ── Row 5: dossier context line — Setup · Market · Session · Score range
+      const setupShort=(()=>{const s=getSetupValue();if(!s)return null;const m=s.match(/\(([^)]+)\)/);return m?m[1]:s.replace(/^[^\w]*/,'').split(' ')[0];})();
+      const ctxParts=[];
+      if(setupShort)ctxParts.push(setupShort);
+      if(activeMkts.length)ctxParts.push(activeMkts.join('/'));
+      const sess=document.querySelector('input[name="session"]:checked');
+      if(sess)ctxParts.push(sess.value);
+      ctxParts.push(total+'/25');
+      html+='<div class="dossier-ctx">'+ctxParts.join(' · ')+'</div>';
 
-      // Matched on
-      html+='<div style="border-top:0.5px solid rgba(201,168,76,0.12);padding-top:10px">'
-        +'<div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:7px">Matched on</div>'
-        +_simBreakdownRows(vd,activeMkts,hold,total)
-        +'</div>';
+      // ── Crew Intel footer — best hold · avg heat label · vault test %
+      // Best hold: most common hold window among matched entries
+      const holdCounts={};
+      scored.forEach(r=>{if(r.entry.expectedHold)holdCounts[r.entry.expectedHold]=(holdCounts[r.entry.expectedHold]||0)+1;});
+      const bestMatchHold=Object.keys(holdCounts).sort((a,b)=>holdCounts[b]-holdCounts[a])[0]||null;
+
+      // Avg heat as readable label
+      const HEAT_LABEL_MAP={5:'Minimal Heat',4:'Acceptable Heat',3:'Moderate Heat',2:'Uncomfortable',1:'Dumpster Fire'};
+      let avgHeatScore=null;
+      if(withHeat.length){
+        const raw=withHeat.reduce((a,r)=>a+r.entry.scores.heat,0)/withHeat.length;
+        avgHeatScore=Math.round(raw);
+      }
+      const heatLabel=avgHeatScore?HEAT_LABEL_MAP[avgHeatScore]:null;
+
+      // Vault test %: % of matched entries where vault === 'yes'
+      const withVault=scored.filter(r=>r.entry.vault==='yes'||r.entry.vault==='no');
+      const vaultYesPct=withVault.length>=3?Math.round(scored.filter(r=>r.entry.vault==='yes').length/withVault.length*100):null;
+
+      const crewParts=[];
+      if(bestMatchHold)crewParts.push(bestMatchHold);
+      if(heatLabel)crewParts.push(heatLabel);
+      if(vaultYesPct!=null)crewParts.push(vaultYesPct+'% Vault Test');
+
+      if(crewParts.length){
+        html+='<div style="margin-top:10px;padding-top:10px;border-top:0.5px solid rgba(201,168,76,0.1)">'
+          +'<div style="font-size:9px;font-weight:700;color:rgba(201,168,76,0.4);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:5px">Crew Intel</div>'
+          +'<div style="font-size:11px;color:rgba(201,168,76,0.5);letter-spacing:0.03em">'+crewParts.join(' · ')+'</div>'
+          +'</div>';
+      }
     }
 
     body.innerHTML=html;
@@ -1370,9 +1479,72 @@ function renderIntel(){
   let weakestCat=null,weakestVal=Infinity;
   CATS.forEach(k=>{if(catAvgs[k]!=null&&catAvgs[k]<weakestVal){weakestVal=catAvgs[k];weakestCat=k;}});
 
+  // ── MOST PROFITABLE ROBBERY
+  // Group by setup+market+session combo, find the one with best avg haul (≥2 trades with pts)
+  const robberyGroups={};
+  recent.forEach(e=>{
+    if(e.actualPts==null||!e.setup)return;
+    const mkts=(e.market&&e.market.length)?e.market.join('/'):'';
+    const key=[e.setup,mkts,e.session||'',e.marketChar||''].join('||');
+    if(!robberyGroups[key])robberyGroups[key]={setup:e.setup,mkts:e.market||[],session:e.session||'',tape:e.marketChar||'',
+      totalPts:0,count:0,wins:0,withOutcome:0,vyTotal:0,vyCount:0,scoreTotal:0,scoreCount:0};
+    const g=robberyGroups[key];
+    g.totalPts+=e.actualPts;g.count++;
+    if(e.outcome){g.withOutcome++;if(e.outcome==='win')g.wins++;}
+    if(e.vaultYield&&e.vaultYield.pct!=null){g.vyTotal+=e.vaultYield.pct;g.vyCount++;}
+    if(e.total){g.scoreTotal+=e.total;g.scoreCount++;}
+  });
+  let bestRobbery=null,bestRobberyAvg=-Infinity;
+  Object.values(robberyGroups).forEach(g=>{
+    if(g.count>=2){const avg=g.totalPts/g.count;if(avg>bestRobberyAvg){bestRobberyAvg=avg;bestRobbery=g;}}
+  });
+
+  // ── CREW LEAK — worst hold window by avg haul (≥2 trades, worse than overall avg)
+  let worstHold=null,worstHoldAvg=Infinity;
+  Object.entries(holdBuckets).forEach(([h,b])=>{
+    if(b.count>=2&&b.total/b.count<worstHoldAvg){worstHoldAvg=b.total/b.count;worstHold=h;}
+  });
+  const leakExists=worstHold&&avgHaul!=null&&worstHoldAvg<(avgHaul-10);
+
   // ── BUILD HTML
   let html='';
 
+  // ── MOST PROFITABLE ROBBERY card
+  if(bestRobbery){
+    const rob=bestRobbery;
+    const robAvgPts=Math.round(rob.totalPts/rob.count);
+    const robWR=rob.withOutcome>=2?Math.round(rob.wins/rob.withOutcome*100):null;
+    const robVY=rob.vyCount>=1?Math.round(rob.vyTotal/rob.vyCount):null;
+    const robScore=rob.scoreCount>=1?Math.round(rob.scoreTotal/rob.scoreCount):null;
+    // stability label based on count
+    const robStab=rob.count>=10?'Durable':rob.count>=4?'Developing':'Early Data';
+    const robStabCol=rob.count>=10?'#97C459':rob.count>=4?'var(--amber)':'var(--txt3)';
+    // clean up setup name — strip emoji prefix for display
+    const setupName=rob.setup.replace(/^[\p{Emoji}\s]+/u,'').replace(/\s*\(.*\)\s*$/,'').trim();
+    const setupSub=rob.setup.match(/\(([^)]+)\)/)?.[1]||'';
+    const tags=[...rob.mkts,rob.session,rob.tape].filter(Boolean);
+    html+='<div class="mpr-card">'
+      +'<div class="mpr-eyebrow">🏆 Most Profitable Robbery</div>'
+      +'<div class="mpr-setup">'+setupName+(setupSub?'<span style="font-size:13px;font-weight:500;color:var(--txt3);margin-left:6px">'+setupSub+'</span>':'')+'</div>'
+      +(tags.length?'<div class="mpr-tags">'+tags.map(t=>'<span class="mpr-tag">'+t+'</span>').join('')+'</div>':'<div style="margin-bottom:14px"></div>')
+      +'<div class="mpr-stats">'
+      +(robScore!=null?'<div class="mpr-stat"><div class="mpr-stat-val">'+robScore+'</div><div class="mpr-stat-lbl">Avg Score</div></div>':'')
+      +(robWR!=null?'<div class="mpr-stat"><div class="mpr-stat-val" style="color:'+(robWR>=70?'#97C459':robWR>=50?'var(--gold)':'var(--red)')+'">'+robWR+'%</div><div class="mpr-stat-lbl">Win Rate</div></div>':'')
+      +'<div class="mpr-stat"><div class="mpr-stat-val" style="color:'+(robAvgPts>=0?'#97C459':'var(--red)')+'">'+(robAvgPts>=0?'+':'')+robAvgPts+'</div><div class="mpr-stat-lbl">Avg Haul</div></div>'
+      +(robVY!=null?'<div class="mpr-stat"><div class="mpr-stat-val">'+robVY+'%</div><div class="mpr-stat-lbl">Vault Yield</div></div>':'')
+      +'</div>'
+      +'<div class="mpr-stab"><span class="conf-dot '+(rob.count>=10?'conf-dot-calibrated':'conf-dot-estimated')+'" style="width:8px;height:8px"></span><span style="color:'+robStabCol+'">'+robStab+'</span><span>· '+rob.count+' trade'+(rob.count!==1?'s':'')+'</span></div>'
+      +'</div>';
+  }
+
+  // ── CREW LEAK card
+  if(leakExists){
+    const diff=Math.round(avgHaul-worstHoldAvg);
+    html+='<div class="leak-card">'
+      +'<div class="leak-head"><span class="leak-icon">🚨</span><span class="leak-title">Crew Leak</span></div>'
+      +'<div class="leak-body">Holding <strong>'+worstHold+'</strong> costs you an average of <strong>'+diff+' pts</strong> vs your overall haul. Cut it earlier.</div>'
+      +'</div>';
+  }
   // top stat cards — 2x3 grid
   html+='<div class="ci-grid">';
   html+='<div class="ci-card"><div class="ci-card-label">Avg Score</div><div class="ci-card-val">'+(avgScore!=null?avgScore.toFixed(1):'—')+'</div><div class="ci-card-sub">out of 25</div></div>';
@@ -1447,5 +1619,62 @@ function showToast(msg){
 
 loadForDate(todayStr());
 </script>
+<!-- ═══ SETUP DEFINITIONS MODAL ═══ -->
+<div class="setup-modal-overlay" id="setup-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="setup-modal">
+    <div class="setup-modal-handle"></div>
+    <div class="setup-modal-title">📖 Setup Definitions</div>
+
+    <div class="setup-def">
+      <div class="setup-def-head">
+        <span class="setup-def-name">🏦 Inside Job</span>
+        <span class="setup-def-sub">Failed Reclaim</span>
+      </div>
+      <div class="setup-def-body">Price attempts to reclaim an important level and fails to hold acceptance, trapping participants on the wrong side and creating a momentum reversal.</div>
+    </div>
+
+    <div class="setup-def">
+      <div class="setup-def-head">
+        <span class="setup-def-name">💵 Loose Cash</span>
+        <span class="setup-def-sub">Gap Fill</span>
+      </div>
+      <div class="setup-def-body">Price targets an inefficiency or gap left behind from a prior session or news event. Easy money sitting on the table — price goes back to collect it.</div>
+    </div>
+
+    <div class="setup-def">
+      <div class="setup-def-head">
+        <span class="setup-def-name">💥 Vault Breach</span>
+        <span class="setup-def-sub">Liquidity Sweep</span>
+      </div>
+      <div class="setup-def-body">External liquidity is raided — price takes out obvious stops above highs or below lows — then reverses or expands in the opposite direction.</div>
+    </div>
+
+    <div class="setup-def">
+      <div class="setup-def-head">
+        <span class="setup-def-name">📋 Blueprint Hit</span>
+        <span class="setup-def-sub">HTF Level Reclaim</span>
+      </div>
+      <div class="setup-def-body">Price reacts from a preplanned higher timeframe location and follows the expected path. The plan was written before the session — execution is just pulling the trigger.</div>
+    </div>
+
+    <div class="setup-def">
+      <div class="setup-def-head">
+        <span class="setup-def-name">🚗 Getaway Route</span>
+        <span class="setup-def-sub">Range Expansion</span>
+      </div>
+      <div class="setup-def-body">Compression resolves and price accepts into expansion. A coiled market breaks out of its range and runs — you're in the car before the doors close.</div>
+    </div>
+
+    <div class="setup-def">
+      <div class="setup-def-head">
+        <span class="setup-def-name">🎭 Unmarked Score</span>
+        <span class="setup-def-sub">Custom</span>
+      </div>
+      <div class="setup-def-body">A setup that doesn't fit a standard classification. Describe it manually. Use sparingly — if you're writing this often, it might be a new setup worth naming.</div>
+    </div>
+
+  </div>
+</div>
+
 </body>
 </html>
