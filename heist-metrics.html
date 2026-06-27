@@ -659,6 +659,10 @@ h2.print-title{display:none}
     <button class="save-btn" onclick="openAuthModal()">&#127968; Log Heist</button>
     <button class="reset-btn no-print" onclick="resetAll()">Reset</button>
   </div>
+  <div class="action-row" style="margin-top:-4px">
+    <button class="reset-btn no-print" style="flex:1;font-size:11px" onclick="exportData()">⬇️ Export Intel</button>
+    <label class="reset-btn no-print" style="flex:1;font-size:11px;cursor:pointer;text-align:center">⬆️ Import Intel<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+  </div>
 
 </div><!-- /tab-score -->
 
@@ -692,6 +696,7 @@ h2.print-title{display:none}
     <div class="ci-eyebrow">Crew Intelligence</div>
     <div class="ci-title">🏆 Performance Report</div>
     <div class="ci-sub" id="ci-sub">Last 30 heists</div>
+    <div style="font-size:10px;color:var(--txt3);margin-top:6px;letter-spacing:0.06em" id="ci-dataset"></div>
   </div>
   <div id="ci-body"></div>
 </div>
@@ -706,6 +711,48 @@ let vaultChoice='';
 let outcomeChoice='';
 let weekOffset=0;
 let heatTouched=false;
+
+const DATASET_VERSION='1.0';
+
+/* ── EXPORT / IMPORT ── */
+function exportData(){
+  const all=getAllEntries();
+  const count=Object.keys(all).length;
+  const now=new Date().toISOString();
+  const payload={version:DATASET_VERSION,exportedAt:now,count,entries:all};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const date=now.slice(0,10);
+  a.href=url;a.download='bhc-intel-'+date+'.json';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+  localStorage.setItem('bhc_last_backup',now);
+  renderIntel();
+  showToast('Exported '+count+' entr'+(count===1?'y':'ies'));
+}
+
+function importData(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const payload=JSON.parse(e.target.result);
+      const incoming=payload.entries||payload; // support both wrapped and raw formats
+      if(typeof incoming!=='object'||Array.isArray(incoming))throw new Error('Invalid format');
+      const existing=getAllEntries();
+      const merged={...existing,...incoming};
+      localStorage.setItem('bhc_heist_metrics',JSON.stringify(merged));
+      const added=Object.keys(incoming).length;
+      renderHistory();renderWeek();renderIntel();
+      showToast('Imported '+added+' entr'+(added===1?'y':'ies'));
+    }catch(err){
+      showToast('❌ Import failed — invalid file');
+    }
+    event.target.value=''; // reset file input
+  };
+  reader.readAsText(file);
+}
 
 /* ── VERDICTS ── */
 const VERDICTS=[
@@ -1173,8 +1220,9 @@ function saveEntry(editKey){
   haul.heat=h?HEAT_R[h]:null;
   const now=new Date().toISOString();
   const all=getAllEntries();
-  // If editing, preserve original savedAt and delete old key
+  // If editing, preserve original savedAt and reuse same key
   const origSavedAt=editKey&&all[editKey]?all[editKey].savedAt:null;
+  const saveKey=editKey||('hm_'+dateKey+'_'+Date.now());
   if(editKey&&all[editKey])delete all[editKey];
   const entry={
     date:dateKey,day:dayName(dateKey),
@@ -1199,8 +1247,9 @@ function saveEntry(editKey){
     savedAt:origSavedAt||now,
     editedAt:origSavedAt?now:null
   };
-  all['hm_'+dateKey+'_'+Date.now()]=entry;
+  all[saveKey]=entry;
   localStorage.setItem('bhc_heist_metrics',JSON.stringify(all));
+  renderHistory();renderWeek();renderIntel();
   showToast(editKey?'Updated — '+entry.day+' '+fmtDate(dateKey):'Saved — '+entry.day+' '+fmtDate(dateKey));
 }
 
@@ -1386,11 +1435,12 @@ function editEntry(key){
   document.getElementById('entry-confirm-action').textContent='load this entry into the scorecard for editing';
   document.getElementById('entry-confirm-btn').onclick=function(){
     document.getElementById('entry-confirm-modal').classList.remove('open');
-    // Store the edit key so saveEntry knows this is an edit
     window._editingKey=key;
     loadHistEntry(key);
-    // Patch save button to pass key
-    document.querySelector('.save-btn').onclick=function(){openAuthModal('edit');};
+    // Show editing indicator on save button
+    const btn=document.querySelector('.save-btn');
+    btn.textContent='✏️ Save Edit';
+    btn.onclick=function(){openAuthModal();};
   };
 }
 
@@ -1462,9 +1512,22 @@ document.querySelectorAll('.nav-btn').forEach(btn=>{
 function renderIntel(){
   const body=document.getElementById('ci-body');
   const all=getAllEntries();
+  const totalCount=Object.keys(all).length;
   const entries=Object.values(all).sort((a,b)=>b.savedAt.localeCompare(a.savedAt));
   const recent=entries.slice(0,30);
   document.getElementById('ci-sub').textContent='Last '+recent.length+' heist'+(recent.length!==1?'s':'');
+  const dsEl=document.getElementById('ci-dataset');
+  if(dsEl){
+    const lastBackup=localStorage.getItem('bhc_last_backup');
+    let backupStr='';
+    if(lastBackup){
+      const diff=Math.floor((Date.now()-new Date(lastBackup).getTime())/86400000);
+      backupStr=diff===0?' · Backed up today ✓':' · Last backup '+diff+' day'+(diff===1?'':' s')+' ago';
+    }else{
+      backupStr=' · No backup yet';
+    }
+    dsEl.textContent='Dataset v'+DATASET_VERSION+' · '+totalCount+' robber'+(totalCount===1?'y':'ies')+' total'+backupStr;
+  }
 
   if(recent.length===0){
     body.innerHTML='<div class="ci-empty"><div class="ci-empty-icon">🏦</div>No heists logged yet.<br>Complete your first scorecard,<br>hit Log Heist, and come back.</div>';
@@ -1786,11 +1849,13 @@ function submitAuth(){
       }else if(_pendingEntryAction==='edit'){
         editEntry(_pendingEntryKey);
       }else{
-        // Normal save — pass edit key if we're in edit mode
+        // Normal save or edit save
         const ek=window._editingKey||null;
         window._editingKey=null;
-        // Restore save button to normal
-        document.querySelector('.save-btn').onclick=function(){openAuthModal();};
+        // Restore save button
+        const btn=document.querySelector('.save-btn');
+        btn.textContent='🏦 Log Heist';
+        btn.onclick=function(){openAuthModal();};
         saveEntry(ek);
       }
       _pendingEntryKey=null;_pendingEntryAction=null;
