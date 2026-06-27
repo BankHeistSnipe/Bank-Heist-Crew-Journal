@@ -185,6 +185,17 @@ html,body{min-height:100%;background:var(--navy);color:var(--txt);font-family:-a
 .vr-status-word{font-size:36px;font-weight:800;letter-spacing:0.06em;line-height:1;margin-bottom:4px}
 .vr-status-sub{font-size:12px;font-weight:500;opacity:0.8;line-height:1.4}
 
+/* AUTH MODAL */
+.auth-input{width:100%;background:var(--navy4);border:1px solid var(--gold-border);border-radius:10px;color:var(--txt);font-size:22px;font-weight:700;letter-spacing:0.3em;text-align:center;padding:14px;margin:18px 0 6px;outline:none;-webkit-text-security:disc;transition:border-color .15s}
+.auth-input:focus{border-color:var(--gold)}
+.auth-input.auth-error{border-color:var(--red);animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.auth-feedback{font-size:13px;font-weight:600;text-align:center;min-height:20px;margin-bottom:14px;letter-spacing:0.04em;transition:opacity .2s}
+.auth-feedback.error{color:var(--red)}
+.auth-feedback.success{color:#97C459}
+.auth-submit{width:100%;background:var(--gold);color:var(--navy);font-size:14px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;border:none;border-radius:12px;padding:14px;cursor:pointer;margin-top:4px}
+.auth-submit:active{opacity:0.85}
+
 /* SETUP INFO MODAL */
 .setup-info-btn{background:none;border:none;cursor:pointer;font-size:13px;color:var(--txt3);padding:0 0 0 5px;line-height:1;vertical-align:middle;transition:color .15s}
 .setup-info-btn:active{color:var(--gold)}
@@ -645,7 +656,7 @@ h2.print-title{display:none}
   </div>
 
   <div class="action-row">
-    <button class="save-btn" onclick="saveEntry()">&#127968; Log Heist</button>
+    <button class="save-btn" onclick="openAuthModal()">&#127968; Log Heist</button>
     <button class="reset-btn no-print" onclick="resetAll()">Reset</button>
   </div>
 
@@ -1678,6 +1689,55 @@ loadForDate(todayStr());
 
   </div>
 </div>
+
+<!-- ═══ AUTH MODAL ═══ -->
+<div class="setup-modal-overlay" id="auth-modal">
+  <div class="setup-modal">
+    <div class="setup-modal-handle"></div>
+    <div style="text-align:center;font-size:28px;margin-bottom:8px">🔐</div>
+    <div class="setup-modal-title" style="text-align:center">Crew Authorization Required</div>
+    <div style="font-size:13px;color:var(--txt2);text-align:center;margin-bottom:4px;line-height:1.5">Only Crew Leaders can commit<br>intelligence to the vault.</div>
+    <input class="auth-input" id="auth-input" type="password" inputmode="numeric" maxlength="10" placeholder="• • • •" autocomplete="off"
+      onkeydown="if(event.key==='Enter')submitAuth()">
+    <div class="auth-feedback" id="auth-feedback"></div>
+    <button class="auth-submit" onclick="submitAuth()">Authorize</button>
+  </div>
+</div>
+
+<script>
+const AUTH_CODE='2026admin';
+
+function openAuthModal(){
+  const m=document.getElementById('auth-modal');
+  const inp=document.getElementById('auth-input');
+  const fb=document.getElementById('auth-feedback');
+  inp.value='';
+  inp.classList.remove('auth-error');
+  fb.textContent='';
+  fb.className='auth-feedback';
+  m.classList.add('open');
+  setTimeout(()=>inp.focus(),300);
+}
+
+function submitAuth(){
+  const inp=document.getElementById('auth-input');
+  const fb=document.getElementById('auth-feedback');
+  if(inp.value===AUTH_CODE){
+    fb.textContent='✅ Intel Secured — logging heist...';
+    fb.className='auth-feedback success';
+    setTimeout(()=>{
+      document.getElementById('auth-modal').classList.remove('open');
+      saveEntry();
+    },800);
+  }else{
+    inp.classList.add('auth-error');
+    fb.textContent='❌ Authorization Failed — intel remains read-only.';
+    fb.className='auth-feedback error';
+    inp.value='';
+    setTimeout(()=>inp.classList.remove('auth-error'),400);
+  }
+}
+</script>
 
 </body>
 </html>
