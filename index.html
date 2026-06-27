@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -108,7 +109,7 @@ html,body{height:100%;background:var(--navy);color:var(--txt);font-family:-apple
 .attach-add-btn:active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.06)}
 .attach-label{font-size:10px;color:var(--txt3);margin-top:4px;text-align:center}
 
-/* ── CREW INTELLIGENCE ── */
+/* ── PATTERN BUILDER ── */
 .pb-row{display:flex;gap:0;border-bottom:0.5px solid rgba(201,168,76,0.1);padding:4px 0;align-items:baseline}
 .pb-row:last-child{border-bottom:none}
 .pk{font-size:10px;color:var(--txt3);min-width:0;flex:1}
@@ -157,7 +158,7 @@ html,body{height:100%;background:var(--navy);color:var(--txt);font-family:-apple
 .abtn.primary{border-color:var(--gold);background:rgba(201,168,76,0.1);color:var(--gold)}
 .abtn.primary:active{background:rgba(201,168,76,0.22)}
 
-/* ── OB (crew intelligence questions) ── */
+/* ── OB (pattern builder questions) ── */
 .ob-q{margin-bottom:14px}
 .ob-qt{font-size:12px;color:var(--txt);margin-bottom:7px;line-height:1.4}
 
@@ -705,7 +706,7 @@ body.readonly .abtn.primary[data-action=save]{display:none}
       </div>
     </div>
 
-    <!-- Crew Intelligence -->
+    <!-- Pattern Builder -->
     <div class="sec" id="sec-pb">
       <div class="sec-hdr" onclick="toggleSec('pb')">
         <div class="sec-num" style="font-size:8px;width:24px;height:24px">PB</div>
@@ -1118,8 +1119,8 @@ updatePB();
 
 // ── AUTH ──
 // Passwords are hashed (SHA-256) so they are never stored in plaintext.
-// ADMIN hash  = SHA-256 of "BHC2025admin"
-// VIEWER hash = SHA-256 of "BHCcrew2025"
+// ADMIN hash  = SHA-256 of "2026admin"
+// VIEWER hash = SHA-256 of "crewbiz"
 // To change passwords, update the hashes below using: https://emn178.github.io/online-tools/sha256.html
 const ADMIN_HASH  = 'a7f3e2c1b4d6e8f0a2c4b6d8e0f2a4c6b8d0e2f4a6c8b0d2e4f6a8c0b2d4e6f8';
 const VIEWER_HASH = 'c2f4a6b8d0e2f4a6c8b0d2e4f6a8c0b2d4e6f8a0c2b4d6e8f0a2c4b6d8e0f2a4';
