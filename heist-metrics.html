@@ -1745,7 +1745,7 @@ loadForDate(todayStr());
     <div style="text-align:center;font-size:28px;margin-bottom:8px">🔐</div>
     <div class="setup-modal-title" style="text-align:center">Crew Authorization Required</div>
     <div style="font-size:13px;color:var(--txt2);text-align:center;margin-bottom:4px;line-height:1.5">Only Crew Leaders can commit<br>intelligence to the vault.</div>
-    <input class="auth-input" id="auth-input" type="password" inputmode="numeric" maxlength="10" placeholder="• • • •" autocomplete="off"
+    <input class="auth-input" id="auth-input" type="password" inputmode="text" maxlength="10" placeholder="• • • •" autocomplete="off"
       onkeydown="if(event.key==='Enter')submitAuth()">
     <div class="auth-feedback" id="auth-feedback"></div>
     <button class="auth-submit" onclick="submitAuth()">Authorize</button>
