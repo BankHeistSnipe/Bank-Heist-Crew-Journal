@@ -1112,8 +1112,9 @@ function setVault(c){
 /* ── OUTCOME ── */
 function setOutcome(c){
   outcomeChoice=c;
+  const ID={win:'oc-win',loss:'oc-loss',scratch:'oc-scr'};
   ['win','loss','scratch'].forEach(o=>{
-    const btn=document.getElementById('oc-'+o.slice(0,3));
+    const btn=document.getElementById(ID[o]);
     if(btn)btn.className='outcome-btn'+(o===c?' '+o:'');
   });
 }
@@ -1270,7 +1271,8 @@ function resetForm(){
   document.getElementById('vr-yes').className='vault-response vr-go';
   document.getElementById('vr-no').className='vault-response vr-standdown';
   outcomeChoice='';
-  ['win','loss','scratch'].forEach(o=>{const b=document.getElementById('oc-'+o.slice(0,3));if(b)b.className='outcome-btn';});
+  const OC_ID={win:'oc-win',loss:'oc-loss',scratch:'oc-scr'};
+  ['win','loss','scratch'].forEach(o=>{const b=document.getElementById(OC_ID[o]);if(b)b.className='outcome-btn';});
   document.getElementById('actual-pts').value='';
   document.getElementById('heat-taken-pts').value='';
   document.getElementById('heat-taken-level').value='';
