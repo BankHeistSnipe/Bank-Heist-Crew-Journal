@@ -6,7 +6,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BHC Journal">
-  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/BankHeistSnipe/Bank-Heist-Crew-Journal/main/BHCLogo.png">
 <title>BHC Daily Mechanics Journal</title>
 <style>
 :root{
@@ -225,6 +224,7 @@ body.readonly .abtn.primary[data-action=save]{display:none}
   <button class="nav-btn" onclick="showView('history')">History</button>
   <button class="nav-btn" onclick="showView('patterns')">Patterns</button>
   <button class="nav-btn" onclick="showView('dashboard')">Dashboard</button>
+  <button class="nav-btn" onclick="showView('crew-report')">📁 Debrief</button>
 </div>
 
 <!-- ═══ JOURNAL VIEW ═══ -->
@@ -971,13 +971,14 @@ function showView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach((b,i)=>{
-    const names=['journal','history','patterns'];
+    const names=['journal','history','patterns','dashboard','crew-report'];
     b.classList.toggle('active',names[i]===v);
   });
   document.getElementById('journal-actions').style.display=v==='journal'?'flex':'none';
   document.getElementById('hist-actions').style.display=v==='history'?'flex':'none';
   if(v==='history') renderHistory();
   if(v==='patterns') renderPatterns();
+  if(v==='crew-report') initCrewReport();
 }
 
 function renderHistory(){
@@ -1109,8 +1110,8 @@ updatePB();
 
 // ── AUTH ──
 // Passwords are hashed (SHA-256) so they are never stored in plaintext.
-// ADMIN hash  = SHA-256 of "2026admin"
-// VIEWER hash = SHA-256 of "crewbiz"
+// ADMIN hash  = SHA-256 of "BHC2025admin"
+// VIEWER hash = SHA-256 of "BHCcrew2025"
 // To change passwords, update the hashes below using: https://emn178.github.io/online-tools/sha256.html
 const ADMIN_HASH  = 'a7f3e2c1b4d6e8f0a2c4b6d8e0f2a4c6b8d0e2f4a6c8b0d2e4f6a8c0b2d4e6f8';
 const VIEWER_HASH = 'c2f4a6b8d0e2f4a6c8b0d2e4f6a8c0b2d4e6f8a0c2b4d6e8f0a2c4b6d8e0f2a4';
@@ -1129,8 +1130,8 @@ async function tryAuth() {
   const err = document.getElementById('auth-err');
   if (!pw) { err.textContent = 'Enter your access code.'; return; }
   const hash = await sha256(pw);
-  const adminHash  = await sha256('2026admin');
-  const viewerHash = await sha256('crewbiz');
+  const adminHash  = await sha256('BHC2025admin');
+  const viewerHash = await sha256('BHCcrew2025');
   if (hash === adminHash) {
     sessionStorage.setItem('bhc_role', 'admin');
     unlockApp('admin');
@@ -1174,6 +1175,116 @@ window.saveEntry = function() {
 };
 
 </script>
+
+<!-- ═══ CREW REPORT VIEW ═══ -->
+<div class="view" id="view-crew-report">
+  <div class="cr-wrap" id="cr-wrap">
+
+    <!-- Date range selector -->
+    <div class="cr-range-panel" id="cr-range-panel">
+      <div class="cr-logo">📈</div>
+      <div class="cr-headline">After Action Report</div>
+      <div class="cr-sub">Select a date range to begin your debrief</div>
+
+      <div class="cr-range-btns">
+        <button class="cr-rb active" data-range="7d" onclick="setCRRange('7d',this)">Last 7 Days</button>
+        <button class="cr-rb" data-range="week" onclick="setCRRange('week',this)">This Week</button>
+        <button class="cr-rb" data-range="month" onclick="setCRRange('month',this)">This Month</button>
+        <button class="cr-rb" data-range="30e" onclick="setCRRange('30e',this)">Last 30 Entries</button>
+        <button class="cr-rb" data-range="custom" onclick="setCRRange('custom',this)">Custom Range</button>
+      </div>
+
+      <div class="cr-custom" id="cr-custom" style="display:none">
+        <div class="cr-custom-row">
+          <div class="cr-custom-field">
+            <label>From</label>
+            <input type="date" id="cr-from" class="cr-date-input">
+          </div>
+          <div class="cr-custom-field">
+            <label>To</label>
+            <input type="date" id="cr-to" class="cr-date-input">
+          </div>
+        </div>
+      </div>
+
+      <div class="cr-count-preview" id="cr-count-preview"></div>
+
+      <button class="cr-gen-btn" id="cr-gen-btn" onclick="generateCrewReport()">
+        <span id="cr-gen-label">Run Debrief</span>
+      </button>
+    </div>
+
+    <!-- Report output -->
+    <div class="cr-report" id="cr-report" style="display:none">
+      <div class="cr-report-header">
+        <div class="cr-report-title">📁 After Action Report</div>
+        <div class="cr-report-range" id="cr-report-range"></div>
+        <button class="cr-back-btn" onclick="showCRPanel()">← New Debrief</button>
+      </div>
+      <div id="cr-report-body"></div>
+    </div>
+
+  </div>
+  <div class="action-bar hidden"></div>
+</div>
+
+<style>
+/* ── CREW REPORT STYLES ── */
+.cr-wrap{padding:16px;max-width:480px;margin:0 auto}
+.cr-range-panel{padding:8px 0 24px}
+.cr-logo{font-size:36px;text-align:center;margin-bottom:6px}
+.cr-headline{font-size:22px;font-weight:700;color:var(--gold);text-align:center;letter-spacing:0.04em}
+.cr-sub{font-size:11px;color:var(--txt3);text-align:center;margin-top:4px;margin-bottom:20px;letter-spacing:0.04em}
+.cr-range-btns{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.cr-rb{width:100%;padding:13px 16px;border-radius:10px;border:0.5px solid var(--border);background:var(--navy3);color:var(--txt2);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;text-align:left;letter-spacing:0.02em;transition:all .15s}
+.cr-rb.active{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+.cr-custom{margin-bottom:12px}
+.cr-custom-row{display:flex;gap:10px}
+.cr-custom-field{flex:1;display:flex;flex-direction:column;gap:4px}
+.cr-custom-field label{font-size:10px;color:var(--txt3);letter-spacing:0.08em;text-transform:uppercase}
+.cr-date-input{background:var(--navy3);border:0.5px solid var(--border);border-radius:8px;padding:9px 10px;font-size:12px;color:var(--gold);font-family:inherit;outline:none;width:100%;-webkit-appearance:none}
+.cr-count-preview{font-size:11px;color:var(--txt3);text-align:center;min-height:18px;margin-bottom:14px}
+.cr-gen-btn{width:100%;padding:15px;border-radius:12px;background:var(--gold);color:var(--navy);font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit;letter-spacing:0.04em;transition:opacity .15s}
+.cr-gen-btn:disabled{opacity:0.5;cursor:default}
+.cr-back-btn{font-size:11px;color:var(--txt3);background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 0;letter-spacing:0.04em}
+/* ── REPORT OUTPUT ── */
+.cr-report-header{margin-bottom:20px;padding-bottom:14px;border-bottom:0.5px solid var(--border)}
+.cr-report-title{font-size:18px;font-weight:700;color:var(--gold);letter-spacing:0.04em}
+.cr-report-range{font-size:11px;color:var(--txt3);margin-top:3px;margin-bottom:8px}
+.cr-section{margin-bottom:22px}
+.cr-section-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:8px;border-bottom:0.5px solid var(--border)}
+.cr-section-icon{font-size:16px}
+.cr-section-title{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase}
+.cr-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.cr-stat-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px}
+.cr-stat{background:var(--navy3);border:0.5px solid var(--border);border-radius:8px;padding:10px 10px;text-align:center}
+.cr-stat-num{font-size:18px;font-weight:700;color:var(--gold);line-height:1}
+.cr-stat-lbl{font-size:9px;color:var(--txt3);letter-spacing:0.07em;text-transform:uppercase;margin-top:3px;line-height:1.3}
+.cr-intel-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid rgba(201,168,76,0.08)}
+.cr-intel-row:last-child{border-bottom:none}
+.cr-intel-lbl{font-size:11px;color:var(--txt3);letter-spacing:0.03em}
+.cr-intel-val{font-size:11px;color:var(--txt);font-weight:600;text-align:right;max-width:55%}
+.cr-intel-val.gold{color:var(--gold)}
+.cr-weakness-row{padding:8px 10px;background:rgba(226,75,74,0.07);border:0.5px solid rgba(226,75,74,0.2);border-radius:8px;margin-bottom:6px}
+.cr-weakness-lbl{font-size:10px;color:#E24B4A;letter-spacing:0.07em;text-transform:uppercase;font-weight:600;margin-bottom:2px}
+.cr-weakness-val{font-size:12px;color:var(--txt2)}
+.cr-ai-block{background:var(--navy3);border:0.5px solid var(--border);border-radius:10px;padding:14px}
+.cr-ai-loading{display:flex;align-items:center;gap:10px;color:var(--txt3);font-size:12px}
+.cr-ai-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:cr-pulse 1.2s ease-in-out infinite}
+.cr-ai-dot:nth-child(2){animation-delay:.2s}
+.cr-ai-dot:nth-child(3){animation-delay:.4s}
+@keyframes cr-pulse{0%,80%,100%{opacity:.3;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
+.cr-ai-text{font-size:12px;color:var(--txt2);line-height:1.65}
+.cr-ai-text p{margin-bottom:8px}
+.cr-ai-text p:last-child{margin-bottom:0}
+.cr-action-list{list-style:none;padding:0;margin:0}
+.cr-action-item{display:flex;gap:10px;padding:9px 0;border-bottom:0.5px solid rgba(201,168,76,0.08)}
+.cr-action-item:last-child{border-bottom:none}
+.cr-action-num{font-size:11px;font-weight:700;color:var(--gold);flex-shrink:0;margin-top:1px}
+.cr-action-text{font-size:12px;color:var(--txt2);line-height:1.5}
+.cr-no-data{text-align:center;padding:40px 20px;color:var(--txt3);font-size:13px}
+.cr-analyst-byline{font-size:10px;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;font-weight:600;margin-bottom:10px;opacity:0.7}
+</style>
 
 <!-- ═══ DASHBOARD VIEW ═══ -->
 <div class="view" id="view-dashboard">
@@ -1445,8 +1556,352 @@ window.saveEntry = function() {
   if (dv && dv.classList.contains('active')) renderDashboard();
 };
 
-// Save day of week into entry state
-const _origBuildState = buildState;
+// ── CREW REPORT ──
+let crRange = '7d';
+let crCustomFrom = '';
+let crCustomTo = '';
+
+function initCrewReport() {
+  setCRRange(crRange, document.querySelector('.cr-rb.active') || document.querySelector('.cr-rb'));
+  // Set default custom dates
+  const today = new Date().toISOString().slice(0,10);
+  const weekAgo = new Date(Date.now() - 7*86400000).toISOString().slice(0,10);
+  if (!document.getElementById('cr-from').value) document.getElementById('cr-from').value = weekAgo;
+  if (!document.getElementById('cr-to').value) document.getElementById('cr-to').value = today;
+  document.getElementById('cr-from').addEventListener('change', updateCRPreview);
+  document.getElementById('cr-to').addEventListener('change', updateCRPreview);
+}
+
+function setCRRange(range, btn) {
+  crRange = range;
+  document.querySelectorAll('.cr-rb').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const custom = document.getElementById('cr-custom');
+  custom.style.display = range === 'custom' ? 'block' : 'none';
+  updateCRPreview();
+}
+
+function getCREntries() {
+  const now = new Date();
+  let from, to;
+  if (crRange === '7d') {
+    from = new Date(now.getTime() - 7*86400000);
+    to = now;
+  } else if (crRange === 'week') {
+    const dow = now.getDay(); // 0=Sun
+    const diff = dow === 0 ? 6 : dow - 1;
+    from = new Date(now.getTime() - diff*86400000);
+    from.setHours(0,0,0,0);
+    to = now;
+  } else if (crRange === 'month') {
+    from = new Date(now.getFullYear(), now.getMonth(), 1);
+    to = now;
+  } else if (crRange === '30e') {
+    return entries.slice(0, 30);
+  } else if (crRange === 'custom') {
+    const f = document.getElementById('cr-from').value;
+    const t = document.getElementById('cr-to').value;
+    if (!f || !t) return [];
+    from = new Date(f + 'T00:00:00');
+    to = new Date(t + 'T23:59:59');
+  }
+  const fromStr = from.toISOString().slice(0,10);
+  const toStr = to.toISOString().slice(0,10);
+  return entries.filter(e => e.date >= fromStr && e.date <= toStr);
+}
+
+function updateCRPreview() {
+  const n = getCREntries().length;
+  const el = document.getElementById('cr-count-preview');
+  if (!entries.length) { el.textContent = 'No entries saved yet.'; return; }
+  el.textContent = n === 0 ? 'No entries in this range.' : `${n} entr${n===1?'y':'ies'} found`;
+}
+
+function showCRPanel() {
+  document.getElementById('cr-range-panel').style.display = 'block';
+  document.getElementById('cr-report').style.display = 'none';
+  updateCRPreview();
+}
+
+function crFreq(data, key) {
+  const m = {};
+  data.forEach(e => {
+    const v = getField(e, key);
+    if (v) m[v] = (m[v]||0) + 1;
+  });
+  return Object.entries(m).sort((a,b) => b[1]-a[1]);
+}
+
+function crTop(data, key) {
+  const f = crFreq(data, key);
+  return f.length ? f[0][0] : '—';
+}
+
+function crTopN(data, key, n=3) {
+  return crFreq(data, key).slice(0,n).map(([v]) => v);
+}
+
+function crRangeLabel() {
+  const now = new Date();
+  if (crRange === '7d') return 'Last 7 Days';
+  if (crRange === 'week') return 'This Week';
+  if (crRange === 'month') return now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  if (crRange === '30e') return 'Last 30 Entries';
+  if (crRange === 'custom') {
+    const f = document.getElementById('cr-from').value;
+    const t = document.getElementById('cr-to').value;
+    return f && t ? `${f} → ${t}` : 'Custom Range';
+  }
+  return '';
+}
+
+async function generateCrewReport() {
+  const data = getCREntries();
+  if (!data.length) { alert('No entries in this range.'); return; }
+
+  const btn = document.getElementById('cr-gen-btn');
+  btn.disabled = true;
+  document.getElementById('cr-gen-label').textContent = 'Running Debrief…';
+
+  document.getElementById('cr-range-panel').style.display = 'none';
+  document.getElementById('cr-report').style.display = 'block';
+  document.getElementById('cr-report-range').textContent = crRangeLabel() + ' · ' + data.length + ' entries';
+
+  const body = document.getElementById('cr-report-body');
+  body.innerHTML = buildCrewReportHTML(data);
+
+  // Now trigger AI sections async
+  await Promise.all([
+    runAIMarketMechanics(data),
+    runAIActionItems(data)
+  ]);
+
+  btn.disabled = false;
+  document.getElementById('cr-gen-label').textContent = 'Run Debrief';
+}
+
+function buildCrewReportHTML(data) {
+  const n = data.length;
+  const wins = data.filter(e => getField(e,'trade-outcome') === 'Win').length;
+  const losses = data.filter(e => getField(e,'trade-outcome') === 'Loss').length;
+  const bes = data.filter(e => getField(e,'trade-outcome') === 'Breakeven').length;
+  const trades = data.filter(e => getField(e,'trade-taken') && getField(e,'trade-taken') !== 'No Trade').length;
+  const wr = trades ? Math.round(wins/trades*100) : 0;
+  const aGrades = data.filter(e => (getField(e,'entry-quality')||'').startsWith('A')).length;
+  const bGrades = data.filter(e => (getField(e,'entry-quality')||'').startsWith('B')).length;
+  const avgGrade = trades ? ((aGrades*3 + bGrades*2 + (trades-aGrades-bGrades)*1)/trades).toFixed(1) : '—';
+
+  // Crew Intel
+  const bestSetup = crTop(data, 'best-trigger');
+  const bestMkt = (() => {
+    const m = {};
+    data.filter(e => getField(e,'trade-outcome') === 'Win').forEach(e => {
+      const k = e.instrument || e.mkt || 'Unknown';
+      m[k] = (m[k]||0) + 1;
+    });
+    const s = Object.entries(m).sort((a,b)=>b[1]-a[1]);
+    return s.length ? s[0][0] : '—';
+  })();
+  const bestSession = (() => {
+    // Use dh-session as a proxy for best session
+    const m = {};
+    data.filter(e => getField(e,'trade-outcome') === 'Win').forEach(e => {
+      const v = getField(e,'dh-session');
+      if (v) m[v] = (m[v]||0)+1;
+    });
+    const s = Object.entries(m).sort((a,b)=>b[1]-a[1]);
+    return s.length ? s[0][0] : crTop(data,'dh-session');
+  })();
+  const bestHold = crTop(data, 'retracement');
+  const bestLevel = crTop(data, 'strongest-lvl');
+  const bestOR = crTop(data, 'or-outcome');
+
+  // Weaknesses
+  const commonMistake = crTop(data, 'ob-q1');
+  const commonEmotion = crTop(data, 'ob-q2');
+  const commonExecError = crTop(data, 'ob-q3');
+  const heatSource = crTop(data, 'largest-exp');
+
+  const sectionMission = `
+    <div class="cr-section">
+      <div class="cr-section-head">
+        <span class="cr-section-icon">🎯</span>
+        <span class="cr-section-title">Mission Summary</span>
+      </div>
+      <div class="cr-stat-grid-3" style="margin-bottom:8px">
+        <div class="cr-stat"><div class="cr-stat-num">${n}</div><div class="cr-stat-lbl">Entries</div></div>
+        <div class="cr-stat"><div class="cr-stat-num">${wr}%</div><div class="cr-stat-lbl">Win Rate</div></div>
+        <div class="cr-stat"><div class="cr-stat-num">${aGrades}</div><div class="cr-stat-lbl">A Setups</div></div>
+      </div>
+      <div class="cr-stat-grid">
+        <div class="cr-stat"><div class="cr-stat-num">${wins}W / ${losses}L</div><div class="cr-stat-lbl">Win / Loss</div></div>
+        <div class="cr-stat"><div class="cr-stat-num">${avgGrade}</div><div class="cr-stat-lbl">Avg Grade</div></div>
+      </div>
+    </div>`;
+
+  const sectionIntel = `
+    <div class="cr-section">
+      <div class="cr-section-head">
+        <span class="cr-section-icon">🏦</span>
+        <span class="cr-section-title">Crew Intel</span>
+      </div>
+      <div class="cr-intel-row"><span class="cr-intel-lbl">Best Setup</span><span class="cr-intel-val gold">${bestSetup}</span></div>
+      <div class="cr-intel-row"><span class="cr-intel-lbl">Best Market</span><span class="cr-intel-val gold">${bestMkt}</span></div>
+      <div class="cr-intel-row"><span class="cr-intel-lbl">Best Session</span><span class="cr-intel-val">${bestSession}</span></div>
+      <div class="cr-intel-row"><span class="cr-intel-lbl">Deepest Retracement</span><span class="cr-intel-val">${bestHold}</span></div>
+      <div class="cr-intel-row"><span class="cr-intel-lbl">Strongest Level</span><span class="cr-intel-val">${bestLevel}</span></div>
+      <div class="cr-intel-row"><span class="cr-intel-lbl">OR Pattern</span><span class="cr-intel-val">${bestOR}</span></div>
+    </div>`;
+
+  const sectionWeakness = `
+    <div class="cr-section">
+      <div class="cr-section-head">
+        <span class="cr-section-icon">⚠️</span>
+        <span class="cr-section-title">Operational Weaknesses</span>
+      </div>
+      ${commonMistake !== '—' ? `<div class="cr-weakness-row"><div class="cr-weakness-lbl">Most Common Mistake</div><div class="cr-weakness-val">${commonMistake}</div></div>` : ''}
+      ${commonEmotion !== '—' ? `<div class="cr-weakness-row"><div class="cr-weakness-lbl">Emotional Pattern</div><div class="cr-weakness-val">${commonEmotion}</div></div>` : ''}
+      ${commonExecError !== '—' ? `<div class="cr-weakness-row"><div class="cr-weakness-lbl">Execution Error</div><div class="cr-weakness-val">${commonExecError}</div></div>` : ''}
+      ${heatSource !== '—' ? `<div class="cr-weakness-row"><div class="cr-weakness-lbl">Largest Expansion</div><div class="cr-weakness-val">${heatSource}</div></div>` : ''}
+      ${[commonMistake,commonEmotion,commonExecError,heatSource].every(v=>v==='—') ? '<div style="font-size:12px;color:var(--txt3);text-align:center;padding:8px 0">No weakness data in this range yet.</div>' : ''}
+    </div>`;
+
+  const sectionMechanics = `
+    <div class="cr-section">
+      <div class="cr-section-head">
+        <span class="cr-section-icon">🧠</span>
+        <span class="cr-section-title">Crew Analyst</span>
+      </div>
+      <div class="cr-ai-block" id="cr-ai-mechanics">
+        <div class="cr-ai-loading">
+          <div class="cr-ai-dot"></div>
+          <div class="cr-ai-dot"></div>
+          <div class="cr-ai-dot"></div>
+          <span style="margin-left:4px">Analyst is reviewing the operations…</span>
+        </div>
+      </div>
+    </div>`;
+
+  const sectionActions = `
+    <div class="cr-section">
+      <div class="cr-section-head">
+        <span class="cr-section-icon">📋</span>
+        <span class="cr-section-title">Action Items</span>
+      </div>
+      <div class="cr-ai-block" id="cr-ai-actions">
+        <div class="cr-ai-loading">
+          <div class="cr-ai-dot"></div>
+          <div class="cr-ai-dot"></div>
+          <div class="cr-ai-dot"></div>
+          <span style="margin-left:4px">Analyst is writing the orders…</span>
+        </div>
+      </div>
+    </div>`;
+
+  return sectionMission + sectionIntel + sectionWeakness + sectionMechanics + sectionActions;
+}
+
+function buildAIContext(data) {
+  // Build a structured data summary for the AI
+  const n = data.length;
+  const freq = (key) => crFreq(data, key).slice(0,5).map(([v,c]) => `${v}(${c})`).join(', ') || 'none';
+  const texts = data.map(e => [
+    e.state && e.state['observation'],
+    e.state && e.state['open-notes'],
+    e.state && e.state['ctx-2'],
+    e.state && e.state['notes-3'],
+    e.state && e.state['ctx-4'],
+    e.state && e.state['trigger-why'],
+    e.state && e.state['tmrw-why'],
+    e.state && e.state['ob-q1-why'],
+    e.state && e.state['ob-q2-why'],
+    e.state && e.state['ob-q3-why'],
+  ].filter(Boolean).join(' | ')).filter(Boolean).slice(0,20).join('\n');
+
+  return `You are analyzing ${n} trading journal entries for a YM/NQ micro futures scalper (NY session, 6:30–8:00 AM PST).
+
+STRUCTURED DATA:
+- Direction: ${freq('move-dir')}
+- Strongest level: ${freq('strongest-lvl')}
+- OR outcome: ${freq('or-outcome')}
+- Best trigger: ${freq('best-trigger')}
+- Retracement: ${freq('retracement')}
+- Closing condition: ${freq('closing')}
+- 7–8 AM behavior: ${freq('7-8-behavior')}
+- First liquidity taken: ${freq('first-liq')}
+- Tokyo direction: ${freq('tokyo-dir')}
+- London direction: ${freq('london-dir')}
+- PDH/PDL reaction: ${freq('pdhl-reaction')}
+- Common mistakes: ${freq('ob-q1')}
+- Emotional patterns: ${freq('ob-q2')}
+- Execution errors: ${freq('ob-q3')}
+
+FREE-TEXT NOTES FROM ENTRIES:
+${texts || '(none)'}`;
+}
+
+async function runAIMarketMechanics(data) {
+  const el = document.getElementById('cr-ai-mechanics');
+  if (!el) return;
+  const ctx = buildAIContext(data);
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `${ctx}
+
+Based on this data, write 3–5 concise "Market Mechanics" insights — recurring patterns you've observed in this data. Write each as a single sentence starting with a market structure observation. Use trader language. Focus on what the market DID repeatedly. Examples: "London frequently swept liquidity before NY continuation." or "Most profitable sessions occurred after PDH was reclaimed in the first 5 minutes."
+
+Return ONLY the insights as a plain bulleted list using • as the bullet. No preamble, no headers, no markdown.`
+        }]
+      })
+    });
+    const d = await res.json();
+    const text = (d.content||[]).map(c=>c.text||'').join('').trim();
+    if (!text || text.length < 10) throw new Error('empty');
+    const lines = text.split('\n').map(l=>l.trim()).filter(l=>l.startsWith('•')||l.startsWith('-')||l.length>10);
+    el.innerHTML = `<div class="cr-analyst-byline">Based on the previous ${data.length} operation${data.length===1?'':'s'}…</div><div class="cr-ai-text">${lines.map(l=>`<p>${l.replace(/^[•\-]\s*/,'')}</p>`).join('')}</div>`;
+  } catch(e) {
+    el.innerHTML = `<div style="font-size:11px;color:var(--txt3)">Crew Analyst unavailable. Unable to access intelligence engine.</div>`;
+  }
+}
+
+async function runAIActionItems(data) {
+  const el = document.getElementById('cr-ai-actions');
+  if (!el) return;
+  const ctx = buildAIContext(data);
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `${ctx}
+
+Based on this trading data, generate exactly 4–5 specific, actionable recommendations for the next trading period. Each should be a concrete behavior change or reinforcement — not vague advice. Write in imperative form. Examples: "Continue prioritizing Inside Job setups at HTF liquidity." or "Reduce hold time beyond 30 minutes unless structure remains clean." or "Avoid forcing trades after the first failed expansion."
+
+Return ONLY a numbered list: 1. 2. 3. etc. No preamble, no headers, no markdown.`
+        }]
+      })
+    });
+    const d = await res.json();
+    const text = (d.content||[]).map(c=>c.text||'').join('').trim();
+    if (!text || text.length < 10) throw new Error('empty');
+    const lines = text.split('\n').map(l=>l.trim()).filter(l=>l.match(/^\d+\.|^[•\-]/)).map(l=>l.replace(/^\d+\.\s*/,'').replace(/^[•\-]\s*/,''));
+    el.innerHTML = `<ul class="cr-action-list">${lines.map((l,i)=>`<li class="cr-action-item"><span class="cr-action-num">${i+1}</span><span class="cr-action-text">${l}</span></li>`).join('')}</ul>`;
+  } catch(e) {
+    el.innerHTML = `<div style="font-size:11px;color:var(--txt3)">Crew Analyst unavailable. Unable to access intelligence engine.</div>`;
+  }
+}
+
 window.buildState = function() {
   const s = _origBuildState();
   const dateVal = document.getElementById('trade-date').value;
