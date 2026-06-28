@@ -1130,8 +1130,8 @@ async function tryAuth() {
   const err = document.getElementById('auth-err');
   if (!pw) { err.textContent = 'Enter your access code.'; return; }
   const hash = await sha256(pw);
-  const adminHash  = await sha256('BHC2025admin');
-  const viewerHash = await sha256('BHCcrew2025');
+  const adminHash  = await sha256('2026admin');
+  const viewerHash = await sha256('crewbiz');
   if (hash === adminHash) {
     sessionStorage.setItem('bhc_role', 'admin');
     unlockApp('admin');
