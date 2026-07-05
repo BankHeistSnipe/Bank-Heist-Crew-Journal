@@ -1911,6 +1911,7 @@ Return ONLY a numbered list: 1. 2. 3. etc. No preamble, no headers, no markdown.
   }
 }
 
+const _origBuildState = buildState;
 window.buildState = function() {
   const s = _origBuildState();
   const dateVal = document.getElementById('trade-date').value;
