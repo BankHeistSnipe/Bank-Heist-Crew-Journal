@@ -397,6 +397,15 @@ body.readonly .abtn.primary[data-action=save]{display:none}
           </div>
         </div>
         <div class="field">
+          <div class="fl">Opening Drive</div>
+          <div class="chips" data-g="opening-drive" data-s="1">
+            <div class="chip" data-v="Expansion Up">⬆️ Expansion Up</div>
+            <div class="chip" data-v="Expansion Down">⬇️ Expansion Down</div>
+            <div class="chip" data-v="Rotation">↔️ Rotation</div>
+            <div class="chip" data-v="Balance">⏸️ Balance</div>
+          </div>
+        </div>
+        <div class="field">
           <div class="fl">First liquidity taken after open</div>
           <div class="chips" data-g="first-liq" data-s="1">
             <div class="chip" data-v="PDH">PDH</div>
@@ -795,7 +804,7 @@ const PMAP=[
   ['tokyo-dir','Tokyo Dir'],['tokyo-htf','Tokyo HTF'],
   ['london-dir','London Dir'],['london-htf','London HTF'],
   ['pm-structure','PM Structure'],['ny-htf','NY After HTF Sweep'],
-  ['open-loc','Open Location'],['first5','First 5-Min'],
+  ['open-loc','Open Location'],['first5','First 5-Min'],['opening-drive','Opening Drive'],
   ['first-liq','First Liq'],['first-target','First Target'],
   ['target-resp','Target Response'],['30min-close','30-Min Close'],
   ['or-outcome','OR Outcome'],['7-8-behavior','7–8 Behavior'],
@@ -1030,7 +1039,7 @@ function deleteEntry(id){
 }
 
 function buildCSV(){
-  const fields=['date','mkt','instrument','tokyo-dir','tokyo-htf','london-dir','london-htf','pm-structure','ny-htf','pdhl-reaction','dh-session','dl-session','price-vs-pdr','open-loc','first5','first-liq','first-target','target-resp','30min-close','lvl-pa-2','exp-2','or-outcome','revisit-3','7-8-behavior','or-confirm','lvl-pa-4','exp-4','strongest-lvl','largest-exp','move-dir','7-8-largest','retracement','revisit-5','closing','ob-q1','ob-q2','ob-q3','best-trigger','tmrw','ctrl-level','trigger-why','observation'];
+  const fields=['date','mkt','instrument','tokyo-dir','tokyo-htf','london-dir','london-htf','pm-structure','ny-htf','pdhl-reaction','dh-session','dl-session','price-vs-pdr','open-loc','first5','opening-drive','first-liq','first-target','target-resp','30min-close','lvl-pa-2','exp-2','or-outcome','revisit-3','7-8-behavior','or-confirm','lvl-pa-4','exp-4','strongest-lvl','largest-exp','move-dir','7-8-largest','retracement','revisit-5','closing','ob-q1','ob-q2','ob-q3','best-trigger','tmrw','ctrl-level','trigger-why','observation'];
   const hdr=fields.join(',');
   const rows=entries.map(e=>{
     return fields.map(f=>{
@@ -1130,8 +1139,8 @@ async function tryAuth() {
   const err = document.getElementById('auth-err');
   if (!pw) { err.textContent = 'Enter your access code.'; return; }
   const hash = await sha256(pw);
-  const adminHash  = await sha256('2026admin');
-  const viewerHash = await sha256('crewbiz');
+  const adminHash  = await sha256('BHC2025admin');
+  const viewerHash = await sha256('BHCcrew2025');
   if (hash === adminHash) {
     sessionStorage.setItem('bhc_role', 'admin');
     unlockApp('admin');
