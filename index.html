@@ -695,6 +695,15 @@ body.readonly .abtn.primary[data-action=save]{display:none}
             <div class="chip" data-v="Mid-Range">Mid-Range</div>
           </div>
         </div>
+        <div class="field">
+          <div class="fl">Closing Behavior</div>
+          <div class="chips" data-g="closing-behavior" data-s="1">
+            <div class="chip" data-v="Trending">Trending</div>
+            <div class="chip" data-v="Balancing">Balancing</div>
+            <div class="chip" data-v="Rejecting">Rejecting</div>
+            <div class="chip" data-v="Exhausting">Exhausting</div>
+          </div>
+        </div>
         <div class="attach-zone">
           <div class="attach-zone-lbl">EOD charts</div>
           <div class="attach-grid" id="ag-s6"></div>
@@ -811,7 +820,7 @@ const PMAP=[
   ['or-outcome','OR Outcome'],['7-8-behavior','7–8 Behavior'],
   ['or-confirm','OR Confirm'],['strongest-lvl','Strongest Level'],
   ['largest-exp','Largest Expansion'],['move-dir','Direction'],
-  ['retracement','Retracement'],['closing','Close Condition'],
+  ['retracement','Retracement'],['closing','Close Condition'],['closing-behavior','Closing Behavior'],
 ];
 
 const ATTACH_SECTIONS=['s0','s1','s2','s3','s4','s5','s6'];
@@ -1040,7 +1049,7 @@ function deleteEntry(id){
 }
 
 function buildCSV(){
-  const fields=['date','mkt','instrument','tokyo-dir','tokyo-htf','london-dir','london-htf','pm-structure','ny-htf','pdhl-reaction','dh-session','dl-session','price-vs-pdr','open-loc','first5','opening-drive','first-liq','first-target','target-resp','30min-close','lvl-pa-2','exp-2','or-outcome','revisit-3','7-8-behavior','or-confirm','lvl-pa-4','exp-4','strongest-lvl','largest-exp','move-dir','7-8-largest','retracement','revisit-5','closing','ob-q1','ob-q2','ob-q3','best-trigger','tmrw','ctrl-level','trigger-why','observation'];
+  const fields=['date','mkt','instrument','tokyo-dir','tokyo-htf','london-dir','london-htf','pm-structure','ny-htf','pdhl-reaction','dh-session','dl-session','price-vs-pdr','open-loc','first5','opening-drive','first-liq','first-target','target-resp','30min-close','lvl-pa-2','exp-2','or-outcome','revisit-3','7-8-behavior','or-confirm','lvl-pa-4','exp-4','strongest-lvl','largest-exp','move-dir','7-8-largest','retracement','revisit-5','closing','closing-behavior','ob-q1','ob-q2','ob-q3','best-trigger','tmrw','ctrl-level','trigger-why','observation'];
   const hdr=fields.join(',');
   const rows=entries.map(e=>{
     return fields.map(f=>{
