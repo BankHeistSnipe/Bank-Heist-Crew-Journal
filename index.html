@@ -122,18 +122,188 @@ html,body{height:100%;background:var(--navy);color:var(--txt);font-family:-apple
 .week-lbl:not(:first-child){margin-top:16px}
 .hist-card{background:var(--navy3);border:0.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
 .hist-card:active{border-color:var(--gold);background:var(--navy4)}
-.hc-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.hc-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .hc-date{font-size:13px;font-weight:700;color:var(--gold)}
 .hc-pill{font-size:10px;color:var(--txt2);background:rgba(201,168,76,0.07);border:0.5px solid var(--border);border-radius:4px;padding:2px 7px}
 .hc-instr{font-size:10px;color:var(--gold);background:rgba(201,168,76,0.12);border:0.5px solid rgba(201,168,76,0.3);border-radius:4px;padding:2px 7px;font-weight:600}
-.hc-summary{font-size:11px;color:var(--txt3);line-height:1.5}
+.hc-blueprint{font-size:11px;color:var(--txt2);line-height:1.6;margin-bottom:6px;padding:7px 10px;background:rgba(201,168,76,0.04);border:0.5px solid rgba(201,168,76,0.1);border-radius:7px}
+.hc-blueprint-lbl{font-size:9px;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;font-weight:700;margin-bottom:3px}
+.hc-blueprint-seq{font-size:11px;color:var(--txt2)}
 .hc-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-.hc-tag{font-size:10px;padding:2px 7px;border-radius:4px;border:0.5px solid rgba(201,168,76,0.15);color:var(--txt2)}
+.hc-tag{font-size:10px;padding:2px 7px;border-radius:4px;border:0.5px solid rgba(201,168,76,0.15);color:var(--txt2);background:rgba(255,255,255,0.03)}
+.hc-tag.green{color:#4ade80;border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.06)}
+.hc-tag.red{color:#f87171;border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.06)}
+.hc-tag.yellow{color:#fbbf24;border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.06)}
+.hc-tag.gray{color:var(--txt3);border-color:rgba(255,255,255,0.1);background:rgba(255,255,255,0.03)}
 .hc-del{font-size:11px;color:var(--txt3);padding:4px 8px;border:0.5px solid var(--border);border-radius:5px;background:transparent;font-family:inherit;cursor:pointer;margin-top:6px}
 .hc-del:active{border-color:#E24B4A;color:#E24B4A}
+.hc-retrace{font-size:10px;color:var(--txt3);margin-top:4px;margin-bottom:2px;letter-spacing:0.03em}
+.hc-retrace-badge{font-size:9px;color:var(--txt3);background:rgba(255,255,255,0.04);border:0.5px solid var(--border);border-radius:4px;padding:1px 6px;letter-spacing:0.04em;vertical-align:middle;margin-left:6px}
+.hc-pid{font-size:9px;color:var(--gold);opacity:0.5;letter-spacing:0.12em;margin-top:5px;font-weight:600;cursor:pointer}
+.hc-pid:hover{opacity:1}
+.hist-search-wrap{padding:12px 12px 0}
+.hist-search{width:100%;background:var(--navy3);border:0.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--gold);font-family:inherit;outline:none;letter-spacing:0.04em;box-sizing:border-box}
+.hist-search::placeholder{color:var(--txt3)}
+.hist-search:focus{border-color:rgba(201,168,76,0.4)}
+.pid-stats{margin:10px 12px 0;background:var(--navy3);border:0.5px solid rgba(201,168,76,0.25);border-radius:10px;padding:12px}
+.pid-stats-id{font-size:10px;color:var(--gold);letter-spacing:0.1em;font-weight:700;text-transform:uppercase;margin-bottom:10px}
+.pid-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pid-break-lbl{font-size:9px;color:var(--txt3);letter-spacing:0.08em;text-transform:uppercase;margin-top:10px;margin-bottom:4px;font-weight:600}
+.pid-break-row{display:flex;justify-content:space-between;font-size:11px;color:var(--txt2);padding:3px 0;border-bottom:0.5px solid rgba(255,255,255,0.04)}
+.pid-break-row:last-child{border-bottom:none}
+.pid-break-row span:last-child{color:var(--gold);font-weight:600}
+.pid-stat{text-align:center;background:rgba(201,168,76,0.04);border-radius:7px;padding:8px 6px}
+.pid-stat-num{font-size:18px;font-weight:700;color:var(--gold);line-height:1}
+.pid-stat-lbl{font-size:9px;color:var(--txt3);letter-spacing:0.07em;text-transform:uppercase;margin-top:3px}
 
 /* ── CSV PANEL ── */
 .csv-body{padding:12px}
+
+/* ── PATTERN ID MODAL ── */
+.pid-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:300;display:none;align-items:flex-end;justify-content:center}
+.pid-modal-overlay.open{display:flex}
+.pid-modal{background:var(--navy2);border:0.5px solid rgba(201,168,76,0.3);border-radius:18px 18px 0 0;width:100%;max-width:480px;max-height:86vh;overflow-y:auto;padding:20px 16px 40px}
+.pid-modal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:0.5px solid var(--border)}
+.pid-modal-id{font-size:15px;font-weight:700;color:var(--gold);letter-spacing:0.12em;cursor:pointer}
+.pid-modal-id:active{opacity:0.6}
+.pid-modal-sub{font-size:9px;color:var(--txt3);margin-top:4px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600}
+.pid-modal-close{background:none;border:none;color:var(--txt3);font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+/* Section wrapper */
+.pid-cf-section{margin-bottom:20px;padding-bottom:18px;border-bottom:0.5px solid var(--border)}
+.pid-cf-section:last-child{border-bottom:none;margin-bottom:0}
+.pid-case-summary{background:rgba(201,168,76,0.07);border:0.5px solid rgba(201,168,76,0.25);border-radius:10px;padding:14px 14px 12px;margin-bottom:20px}
+.pid-case-summary-lbl{font-size:8px;font-weight:700;color:var(--gold);letter-spacing:0.18em;text-transform:uppercase;margin-bottom:10px;opacity:0.7}
+.pid-case-summary-line{font-size:12px;color:var(--txt);line-height:1.65;margin-bottom:5px}
+.pid-case-summary-line:last-child{margin-bottom:0}
+.pid-brief-loading{font-size:11px;color:var(--txt3);letter-spacing:0.03em;font-style:italic}
+/* Scorecard */
+.pid-scorecard{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;padding-bottom:12px;border-bottom:0.5px solid rgba(201,168,76,0.15)}
+.pid-scorecard-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.pid-scorecard-lbl{font-size:9px;color:var(--txt3);letter-spacing:0.06em;white-space:nowrap;flex-shrink:0}
+.pid-scorecard-val{font-size:11px;color:var(--txt);font-weight:600;text-align:right}
+.pid-scorecard-val.green{color:#4ade80}
+.pid-scorecard-val.red{color:#f87171}
+.pid-scorecard-val.gold{color:var(--gold)}
+/* Findings — 3 colors only */
+.pid-finding{border-radius:8px;padding:10px 12px;margin-bottom:7px}
+.pid-finding:last-child{margin-bottom:0}
+.pid-finding-conf{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;margin-bottom:5px}
+.pid-finding-text{font-size:12px;line-height:1.6;color:var(--txt)}
+.pid-finding-high{background:rgba(74,222,128,0.05);border:0.5px solid rgba(74,222,128,0.2)}
+.pid-finding-high .pid-finding-conf{color:#4ade80}
+.pid-finding-mid{background:rgba(201,168,76,0.05);border:0.5px solid rgba(201,168,76,0.18)}
+.pid-finding-mid .pid-finding-conf{color:var(--gold)}
+.pid-finding-low{background:rgba(255,255,255,0.02);border:0.5px solid var(--border)}
+.pid-finding-low .pid-finding-conf{color:var(--txt3)}
+.pid-finding-assessment{background:rgba(255,255,255,0.015);border:0.5px solid var(--border);border-left:2px solid rgba(74,222,128,0.35)}
+.pid-finding-assessment .pid-finding-conf{color:var(--txt3)}
+.pid-assessment-italic{font-style:italic;color:var(--txt2)}
+.pid-finding-meta{font-size:9px;color:var(--txt3);margin-top:8px;letter-spacing:0.03em}
+.pid-finding-combo-card{background:rgba(201,168,76,0.06);border:0.5px solid rgba(201,168,76,0.25);border-radius:8px;padding:10px 12px;margin-bottom:7px}
+.pid-finding-combo-card .pid-finding-conf{color:var(--gold)}
+.pid-combo-lbl{font-size:9px;color:var(--txt3);letter-spacing:0.07em;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+.pid-combo-condition{font-size:12px;color:var(--txt);line-height:1.7;padding-left:4px}
+.pid-combo-outcome{font-size:12px;color:var(--gold);font-weight:600;line-height:1.5}
+.pid-combo-outcome-big{font-size:28px;font-weight:700;color:var(--gold);line-height:1.1;margin-top:2px}
+.pid-combo-outcome-lbl{font-size:11px;color:var(--txt2);margin-top:2px}
+font-size:13px;color:var(--gold);font-weight:600;margin-top:4px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pid-intel-line.warn{color:#f87171}
+.pid-intel-stat{font-size:10px;color:var(--txt3);font-weight:400}
+/* Inline typical path */
+.pid-path-inline{font-size:12px;color:var(--txt2);line-height:1.6;margin-bottom:4px;word-break:break-word}
+/* Tappable PID parts */
+.pid-part-tip{cursor:help;border-bottom:0.5px dashed rgba(201,168,76,0.4)}
+/* Reliability layout */
+.pid-conf{background:rgba(201,168,76,0.05);border:0.5px solid rgba(201,168,76,0.18);border-radius:10px;padding:14px;display:flex;align-items:flex-start;gap:14px}
+.pid-conf-stars{font-size:20px;letter-spacing:3px;flex-shrink:0;padding-top:2px}
+.pid-conf-metrics{flex:1;display:flex;flex-direction:column;gap:7px}
+.pid-conf-row{display:flex;justify-content:space-between;align-items:center}
+.pid-conf-metric-lbl{font-size:10px;color:var(--txt3);letter-spacing:0.04em}
+.pid-conf-metric-val{font-size:13px;font-weight:700;color:var(--txt)}
+.pid-conf-metric-val.pos{color:#4ade80}
+.pid-conf-metric-val.neg{color:#f87171}
+.pid-edge-tip{cursor:help;border-bottom:0.5px dashed rgba(255,255,255,0.2)}
+/* Pattern age */
+.pid-age-row{display:flex;gap:8px;margin-top:4px}
+.pid-age-item{flex:1;background:var(--navy3);border-radius:7px;padding:8px;text-align:center}
+.pid-age-lbl{font-size:9px;color:var(--txt3);letter-spacing:0.07em;text-transform:uppercase;margin-bottom:3px}
+.pid-age-val{font-size:12px;font-weight:600;color:var(--txt2)}
+/* Failure pattern */
+.pid-failure-trigger{font-size:10px;color:var(--txt3);letter-spacing:0.04em;margin-bottom:3px}
+.pid-failure-close{font-size:15px;font-weight:700;color:#f87171;margin-bottom:4px}
+.pid-cf-lbl{font-size:9px;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;font-weight:700;margin-bottom:10px;opacity:0.7}
+/* Reliability */
+.pid-conf{background:rgba(201,168,76,0.05);border:0.5px solid rgba(201,168,76,0.18);border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between}
+.pid-conf-left{display:flex;flex-direction:column;gap:4px}
+.pid-conf-stars{font-size:18px;letter-spacing:3px}
+.pid-conf-grade{font-size:10px;color:var(--txt3);letter-spacing:0.04em}
+.pid-conf-pct{font-size:32px;font-weight:700;color:var(--gold);line-height:1}
+/* Performance */
+.pid-modal-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pid-ms{background:var(--navy3);border-radius:8px;padding:10px;text-align:center}
+.pid-ms-num{font-size:20px;font-weight:700;color:var(--gold);line-height:1}
+.pid-ms-lbl{font-size:9px;color:var(--txt3);letter-spacing:0.07em;text-transform:uppercase;margin-top:3px}
+/* Expectation */
+.pid-exp-row{display:flex;align-items:baseline;gap:10px;padding:7px 0;border-bottom:0.5px solid rgba(255,255,255,0.04)}
+.pid-exp-row:last-child{border-bottom:none}
+.pid-exp-pct{font-size:18px;font-weight:700;color:var(--gold);min-width:38px;line-height:1}
+.pid-exp-lbl{font-size:12px;color:var(--txt2)}
+.pid-exp-bar{height:3px;background:rgba(201,168,76,0.12);border-radius:2px;margin-top:3px}
+.pid-exp-fill{height:3px;background:var(--gold);border-radius:2px}
+/* Typical Path */
+.pid-path{display:flex;flex-direction:column;align-items:flex-start;gap:0}
+.pid-path-step{font-size:11px;color:var(--txt2);background:var(--navy3);border:0.5px solid var(--border);border-radius:6px;padding:5px 10px}
+.pid-path-arrow{font-size:11px;color:var(--txt3);padding:2px 0 2px 10px}
+.pid-path-pct{font-size:9px;color:var(--txt3);margin-top:8px;letter-spacing:0.04em}
+/* Trigger Intel */
+.pid-trig-row{display:flex;align-items:center;gap:0;padding:9px 12px;border-radius:8px;margin-bottom:6px}
+.pid-trig-row.green{background:rgba(74,222,128,0.05);border:0.5px solid rgba(74,222,128,0.2)}
+.pid-trig-row.red{background:rgba(248,113,113,0.05);border:0.5px solid rgba(248,113,113,0.2)}
+.pid-trig-label{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;width:44px;flex-shrink:0}
+.pid-trig-row.green .pid-trig-label{color:#4ade80}
+.pid-trig-row.red .pid-trig-label{color:#f87171}
+.pid-trig-name{font-size:12px;color:var(--txt);flex:1;padding-left:6px}
+.pid-trig-wr{font-size:13px;font-weight:700;color:var(--gold)}
+/* Failure Pattern */
+.pid-failure{background:rgba(248,113,113,0.05);border:0.5px solid rgba(248,113,113,0.2);border-radius:8px;padding:12px}
+.pid-failure-close{font-size:14px;font-weight:700;color:#f87171;margin-bottom:3px}
+.pid-failure-stat{font-size:10px;color:var(--txt3);letter-spacing:0.03em;margin-bottom:6px}
+.pid-failure-note{font-size:11px;color:var(--txt2);line-height:1.55;padding-top:6px;border-top:0.5px solid rgba(248,113,113,0.15)}
+/* Distribution */
+.pid-dist-sublbl{font-size:9px;color:var(--txt3);letter-spacing:0.08em;text-transform:uppercase;font-weight:600;margin-bottom:5px;margin-top:10px}
+.pid-dist-sublbl:first-child{margin-top:0}
+.pid-dist-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:0.5px solid rgba(255,255,255,0.04)}
+.pid-dist-row:last-child{border-bottom:none}
+.pid-dist-lbl{font-size:11px;color:var(--txt2)}
+.pid-dist-val{font-size:11px;font-weight:600;color:var(--gold)}
+.pid-dist-bar{height:3px;background:rgba(201,168,76,0.12);border-radius:2px;margin-top:2px;margin-bottom:4px}
+.pid-dist-fill{height:3px;background:var(--gold);border-radius:2px}
+/* History */
+.pid-last-seen{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.pid-last-date{font-size:11px;color:var(--txt2);display:flex;align-items:center;gap:6px}
+.pid-last-date.newest{color:var(--gold);font-weight:600}
+.pid-last-star{font-size:10px}
+/* Recent sessions */
+.pid-recents{display:flex;flex-direction:column;gap:5px}
+.pid-recent-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--navy3);border-radius:8px;cursor:pointer;transition:opacity .15s}
+.pid-recent-row:active{opacity:0.6}
+.pid-recent-date{font-size:11px;color:var(--gold);font-weight:600}
+.pid-recent-pid{font-size:9px;color:var(--txt3);letter-spacing:0.08em;margin-top:2px}
+.pid-outcome-pill{font-size:9px;font-weight:700;letter-spacing:0.08em;padding:2px 7px;border-radius:4px}
+.pid-outcome-pill.win{color:#4ade80;background:rgba(74,222,128,0.1);border:0.5px solid rgba(74,222,128,0.3)}
+.pid-outcome-pill.loss{color:#f87171;background:rgba(248,113,113,0.1);border:0.5px solid rgba(248,113,113,0.3)}
+.pid-outcome-pill.be{color:var(--txt3);background:rgba(255,255,255,0.04);border:0.5px solid var(--border)}
+/* ── BLUEPRINT PILLS ── */
+.hc-bp-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.hc-bp-pill{font-size:10px;color:var(--txt2);background:rgba(255,255,255,0.04);border:0.5px solid var(--border);border-radius:5px;padding:2px 7px;line-height:1.5}
+.hc-bp-pill.lvl{color:var(--gold);border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.06)}
+.hc-bp-arrow{font-size:9px;color:var(--txt3);align-self:center;padding:0 1px}
+/* ── PID BADGE ON CARD ── */
+.hc-pid-row{display:flex;align-items:center;gap:6px;margin-top:5px}
+.hc-pid{font-size:9px;color:var(--gold);letter-spacing:0.1em;font-weight:700;cursor:pointer;background:rgba(201,168,76,0.06);border:0.5px solid rgba(201,168,76,0.2);border-radius:5px;padding:2px 7px;transition:all .15s}
+.hc-pid:active{background:rgba(201,168,76,0.15)}
+.hc-pid-count{font-size:9px;color:var(--txt3);letter-spacing:0.04em}
+.hc-pid-last{font-size:9px;color:var(--txt3)}
 .csv-info{font-size:12px;color:var(--txt2);line-height:1.6;margin-bottom:16px;padding:12px;background:var(--navy3);border-radius:8px;border:0.5px solid var(--border)}
 .csv-info span{color:var(--gold);font-weight:600}
 .btn-big{width:100%;padding:14px;border-radius:10px;border:1px solid var(--gold);background:rgba(201,168,76,0.08);color:var(--gold);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:0.04em;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
@@ -788,8 +958,26 @@ body.readonly .abtn.primary[data-action=save]{display:none}
 
 </div><!-- end view-journal -->
 
+<!-- ═══ PATTERN ID MODAL ═══ -->
+<div class="pid-modal-overlay" id="pid-modal-overlay" onclick="closePidModal()">
+  <div class="pid-modal" onclick="event.stopPropagation()">
+    <div class="pid-modal-header">
+      <div>
+        <div class="pid-modal-id" id="pid-modal-id"></div>
+        <div class="pid-modal-sub" id="pid-modal-sub"></div>
+      </div>
+      <button class="pid-modal-close" onclick="closePidModal()">✕</button>
+    </div>
+    <div class="pid-modal-body" id="pid-modal-body"></div>
+  </div>
+</div>
+
 <!-- ═══ HISTORY VIEW ═══ -->
 <div class="view" id="view-history">
+  <div class="hist-search-wrap">
+    <input class="hist-search" id="hist-search" type="text" placeholder="Search Pattern ID… e.g. ORL-LS" oninput="renderHistory()">
+  </div>
+  <div id="pid-stats-panel"></div>
   <div class="hist-body" id="hist-body"></div>
   <div class="action-bar" id="hist-actions">
     <button class="abtn primary" onclick="downloadCSV()">Download CSV</button>
@@ -1000,35 +1188,209 @@ function showView(v){
   if(v==='crew-report') initCrewReport();
 }
 
+function buildPatternId(e) {
+  function gv(k){ return e.state&&e.state[k]?e.state[k][0]:''; }
+  const level   = gv('strongest-lvl');
+  const trigger = gv('best-trigger');
+  const target  = gv('first-target');
+  const tResp   = gv('target-resp');
+  const closing = gv('closing');
+  const closingB= gv('closing-behavior');
+
+  const LVL  = {'Daily High':'DH','Daily Low':'DL','Weekly High':'WH','Weekly Low':'WL','Other':'OTH'};
+  const TRIG = {'Liq Sweep':'LS','Wick Rejection':'WR','Break + Retest':'BR','Engulfing':'EG',
+                'Displacement':'DP','Fib Retrace':'FB','Other':'OT'};
+
+  // Target prefix: P=PDH/PDL, O=ON highs/lows, L=London, A=Asia/Tokyo, W=Weekly
+  const TARG_PFX = {
+    'PDH':'P','PDL':'P',
+    'ONH':'O','ONL':'O',
+    'PWH':'W','PWL':'W',
+    'Daily High':'D','Daily Low':'D',
+    'Other':'X'
+  };
+  // Response suffix: A=Accepted, R=Rejected, S=Swept+Rev, C=Consolidated
+  const RESP_SFX = {
+    'Accepted + Continued':'A','Accepted':'A',
+    'Rejected':'R',
+    'Swept + Reversed':'S','Swept/Rev':'S',
+    'Consolidated':'C'
+  };
+
+  const CLOSE = {'Near High':'NH','Near Low':'NL','Mid-Range':'MR'};
+  const BEHAV = {'Trending':'T','Balancing':'B','Rejecting':'R','Exhausting':'E'};
+
+  const lvlId  = LVL[level]    || level;
+  const trigId = TRIG[trigger] || (trigger ? trigger.slice(0,2).toUpperCase() : '');
+
+  // Confirmation: e.g. PA = PDH Accepted, PR = PDH Rejected, OA = ONH Accepted
+  const tPfx   = TARG_PFX[target] || '';
+  const rSfx   = RESP_SFX[tResp]  || '';
+  const confId = tPfx && rSfx ? tPfx + rSfx : (tPfx || rSfx);
+
+  const closeId = CLOSE[closing]  || '';
+  const behavId = BEHAV[closingB] || '';
+
+  return [lvlId, trigId, confId, closeId, behavId].filter(Boolean).join('-');
+}
+
+function filterByPid(pid){
+  const el = document.getElementById('hist-search');
+  if(el){ el.value = pid; renderHistory(); }
+}
+
 function renderHistory(){
-  const body=document.getElementById('hist-body');
-  if(!entries.length){body.innerHTML='<div class="hist-empty">No saved entries yet.<br>Fill out the journal and tap Save Entry.</div>';return;}
-  const now=new Date();
-  const cut=new Date(now.getTime()-14*86400000);
-  const recent=entries.filter(e=>new Date(e.date+'T12:00:00')>=cut);
-  const older=entries.filter(e=>new Date(e.date+'T12:00:00')<cut);
-  let h='';
+  const body = document.getElementById('hist-body');
+  if(!entries.length){
+    body.innerHTML='<div class="hist-empty">No saved entries yet.<br>Fill out the journal and tap Save Entry.</div>';
+    const sp=document.getElementById('pid-stats-panel'); if(sp) sp.innerHTML='';
+    return;
+  }
+  const searchEl = document.getElementById('hist-search');
+  const search = searchEl ? searchEl.value.trim().toUpperCase() : '';
+
+  // Build pattern stats across all entries
+  const pidMap = {};
+  entries.forEach(e => {
+    const pid = buildPatternId(e);
+    if(!pid) return;
+    if(!pidMap[pid]) pidMap[pid]={count:0,wins:0,dates:[],finishes:{},behaviors:{}};
+    pidMap[pid].count++;
+    pidMap[pid].dates.push(e.date);
+    const outcome=e.state&&e.state['trade-outcome']?e.state['trade-outcome'][0]:'';
+    if(outcome==='Win') pidMap[pid].wins++;
+    const cl=e.state&&e.state['closing']?e.state['closing'][0]:'';
+    const bh=e.state&&e.state['closing-behavior']?e.state['closing-behavior'][0]:'';
+    if(cl) pidMap[pid].finishes[cl]=(pidMap[pid].finishes[cl]||0)+1;
+    if(bh) pidMap[pid].behaviors[bh]=(pidMap[pid].behaviors[bh]||0)+1;
+  });
+
+  // Stats panel
+  const statsPanel = document.getElementById('pid-stats-panel');
+  if(statsPanel){
+    const matchedPids = Object.keys(pidMap).filter(k=>search.length>=2 && k.startsWith(search));
+    if(search.length>=2 && matchedPids.length){
+      let total=0,wins=0;
+      const finishBreak={}, behavBreak={};
+      matchedPids.forEach(p=>{
+        total+=pidMap[p].count;
+        wins+=pidMap[p].wins;
+      });
+      // Collect finish and behavior breakdowns from matching entries
+      const matchedEntries = entries.filter(e=>{
+        const pid=buildPatternId(e);
+        return pid && pid.startsWith(search);
+      });
+      matchedEntries.forEach(e=>{
+        const cl=e.state&&e.state['closing']?e.state['closing'][0]:'Unknown';
+        const bh=e.state&&e.state['closing-behavior']?e.state['closing-behavior'][0]:'Unknown';
+        finishBreak[cl]=(finishBreak[cl]||0)+1;
+        behavBreak[bh]=(behavBreak[bh]||0)+1;
+      });
+      const wr=total?Math.round(wins/total*100):0;
+      const pidLabel=matchedPids.length===1?matchedPids[0]:search+'*';
+      const finishRows=Object.entries(finishBreak).sort((a,b)=>b[1]-a[1])
+        .map(([k,v])=>`<div class="pid-break-row"><span>${k}</span><span>${v}× (${Math.round(v/total*100)}%)</span></div>`).join('');
+      const behavRows=Object.entries(behavBreak).sort((a,b)=>b[1]-a[1])
+        .map(([k,v])=>`<div class="pid-break-row"><span>${k}</span><span>${v}× (${Math.round(v/total*100)}%)</span></div>`).join('');
+      statsPanel.innerHTML=`<div class="pid-stats">
+        <div class="pid-stats-id">📊 ${pidLabel}</div>
+        <div class="pid-stats-grid">
+          <div class="pid-stat"><div class="pid-stat-num">${total}</div><div class="pid-stat-lbl">Occurrences</div></div>
+          <div class="pid-stat"><div class="pid-stat-num">${wr}%</div><div class="pid-stat-lbl">Win Rate</div></div>
+          <div class="pid-stat"><div class="pid-stat-num">${wins}</div><div class="pid-stat-lbl">Wins</div></div>
+          <div class="pid-stat"><div class="pid-stat-num">${total-wins}</div><div class="pid-stat-lbl">Losses</div></div>
+        </div>
+        ${finishRows?`<div class="pid-break-lbl">Finish Distribution</div>${finishRows}`:''}
+        ${behavRows?`<div class="pid-break-lbl" style="margin-top:8px">Closing Behavior</div>${behavRows}`:''}
+      </div>`;
+    } else { statsPanel.innerHTML=''; }
+  }
+
+  const GREEN_VALS  = new Set(['Up','Bullish','Trending','Accepted','Accepted + Continued','Expansion Up','Bull Engulf','Respected PDH','Respected PDL','HH / HL']);
+  const RED_VALS    = new Set(['Down','Bearish','Rejected','Rejecting','Expansion Down','Bear Engulf','Rejected PDH','Rejected PDL','LH / LL']);
+  const YELLOW_VALS = new Set(['False Break','False Break Low','False Break High','Liq Sweep','Wick Rejection','Wick Rej','Swept + Reversed','Inside Job']);
+  const GRAY_VALS   = new Set(['Balance','Balancing','Neutral','Rotation','Exhausting','Mid-Range','Range','Consolidated']);
+
+  function tagClass(v){
+    if(GREEN_VALS.has(v))  return 'green';
+    if(RED_VALS.has(v))    return 'red';
+    if(YELLOW_VALS.has(v)) return 'yellow';
+    if(GRAY_VALS.has(v))   return 'gray';
+    return '';
+  }
+  function g(e,key){ return e.state&&e.state[key]?e.state[key][0]:''; }
+  function short(v){
+    const m={'Accepted + Continued':'Accepted','Swept + Reversed':'Swept+Rev','Wick Rejection':'Wick Rej',
+      'Break + Retest':'B+R','Displacement':'Disp','Engulfing':'Engulf','Multiple Rejections':'Multi Rej'};
+    return m[v]||v;
+  }
+
+  const filtered = search ? entries.filter(e=>buildPatternId(e).includes(search)) : entries;
+  const now=new Date(), cut=new Date(now.getTime()-14*86400000);
+  const recent=filtered.filter(e=>new Date(e.date+'T12:00:00')>=cut);
+  const older =filtered.filter(e=>new Date(e.date+'T12:00:00')<cut);
+
   function card(e){
     const d=new Date(e.date+'T12:00:00');
     const fmt=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    const dir=e.state&&e.state['move-dir']?e.state['move-dir'][0]:'';
-    const cl=e.state&&e.state['closing']?e.state['closing'][0]:'';
-    const or=e.state&&e.state['or-outcome']?e.state['or-outcome'][0]:'';
-    const trig=e.state&&e.state['best-trigger']?e.state['best-trigger'][0]:'';
-    const tags=[dir,cl,or,trig].filter(Boolean);
+    const level=g(e,'strongest-lvl'), trigger=short(g(e,'best-trigger')), pa=short(g(e,'lvl-pa-4'));
+    const tResp=short(g(e,'target-resp')), target=g(e,'first-target');
+    const closing=g(e,'closing'), closingBeh=g(e,'closing-behavior'), retr=g(e,'retracement'), dir=g(e,'move-dir');
+
+    const confParts=[pa, target&&tResp?`${target} ${tResp}`:(target||tResp)].filter(Boolean);
+    const confPart=confParts.join(' + ');
+    const finishPart=[closing,closingBeh].filter(Boolean).join(' · ');
+
+    // Pill-style Blueprint segments
+    const bpSegs=[
+      level   ? `<span class="hc-bp-pill lvl">${level}</span>` : '',
+      trigger ? `<span class="hc-bp-arrow">→</span><span class="hc-bp-pill">${trigger}</span>` : '',
+      confPart? `<span class="hc-bp-arrow">→</span><span class="hc-bp-pill">${confPart}</span>` : '',
+      finishPart?`<span class="hc-bp-arrow">→</span><span class="hc-bp-pill">${finishPart}</span>` : '',
+    ].filter(Boolean);
+    const pillsHTML = bpSegs.length ? `<div class="hc-bp-pills">${bpSegs.join('')}</div>` : '<div style="font-size:11px;color:var(--txt3)">—</div>';
+
+    const patternId=buildPatternId(e);
+    const ps=patternId&&pidMap[patternId]?pidMap[patternId]:null;
+    const retrBadge=retr?`<span class="hc-retrace-badge">${retr}</span>`:'';
+    const tagVals=[dir,g(e,'opening-drive'),g(e,'or-outcome'),closingBeh].filter(Boolean);
+    const tagsHTML=tagVals.map(t=>`<span class="hc-tag ${tagClass(t)}">${t}</span>`).join('');
+
+    // PID badge row with count + last seen
+    let pidHTML='';
+    if(patternId){
+      const cnt = ps ? ps.count : 1;
+      const lastDates = ps && ps.dates ? ps.dates.slice(-3).reverse().map(d=>new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})).join(' · ') : '';
+      pidHTML=`<div class="hc-pid-row">
+        <span class="hc-pid"
+          onclick="event.stopPropagation();openPidModal('${patternId}')"
+          oncontextmenu="event.preventDefault();event.stopPropagation();copyPid('${patternId}')"
+        >${patternId}</span>
+        <span class="hc-pid-count">${cnt>1?`${cnt}×`:''}</span>
+        ${lastDates&&cnt>1?`<span class="hc-pid-last">Last: ${lastDates.split(' · ')[0]}</span>`:''}
+      </div>`;
+    }
+
     return `<div class="hist-card" onclick="loadEntry('${e.id}')">
-      <div class="hc-top">
-        <span class="hc-date">${fmt}</span>
-        <span class="hc-pill">${e.mkt}</span>
-        <span class="hc-instr">${e.instrument}</span>
+      <div class="hc-top"><span class="hc-date">${fmt}</span><span class="hc-pill">${e.mkt}</span><span class="hc-instr">${e.instrument}</span>${retrBadge}</div>
+      <div class="hc-blueprint">
+        <div class="hc-blueprint-lbl">Blueprint</div>
+        ${pillsHTML}
       </div>
-      <div class="hc-summary">Strongest: ${e.state&&e.state['strongest-lvl']?e.state['strongest-lvl'][0]:'—'} &nbsp;·&nbsp; Retrace: ${e.state&&e.state['retracement']?e.state['retracement'][0]:'—'}</div>
-      <div class="hc-tags">${tags.map(t=>`<span class="hc-tag">${t}</span>`).join('')}</div>
+      ${pidHTML}
+      <div class="hc-tags">${tagsHTML}</div>
       <button class="hc-del" onclick="event.stopPropagation();deleteEntry('${e.id}')">Delete</button>
     </div>`;
   }
-  if(recent.length){h+='<div class="week-lbl">Last 2 weeks</div>';h+=recent.map(card).join('');}
-  if(older.length){h+='<div class="week-lbl">Older</div>';h+=older.map(card).join('');}
+
+  let h='';
+  if(!filtered.length){
+    h='<div style="text-align:center;padding:32px 20px;color:var(--txt3);font-size:12px">No entries match that pattern.</div>';
+  } else {
+    if(recent.length){h+='<div class="week-lbl">Last 2 weeks</div>'+recent.map(card).join('');}
+    if(older.length){h+='<div class="week-lbl">Older</div>'+older.map(card).join('');}
+  }
   body.innerHTML=h;
 }
 
@@ -1919,6 +2281,469 @@ Return ONLY a numbered list: 1. 2. 3. etc. No preamble, no headers, no markdown.
   } catch(e) {
     el.innerHTML = `<div style="font-size:11px;color:var(--txt3)">Crew Analyst unavailable. Unable to access intelligence engine.</div>`;
   }
+}
+
+function openPidModal(pid){
+  const overlay=document.getElementById('pid-modal-overlay');
+  const idEl=document.getElementById('pid-modal-id');
+  const subEl=document.getElementById('pid-modal-sub');
+  const bodyEl=document.getElementById('pid-modal-body');
+  if(!overlay) return;
+
+  const matched=entries.filter(e=>buildPatternId(e)===pid);
+  const total=matched.length;
+  const wins=matched.filter(e=>e.state&&e.state['trade-outcome']&&e.state['trade-outcome'][0]==='Win').length;
+  const losses=matched.filter(e=>e.state&&e.state['trade-outcome']&&e.state['trade-outcome'][0]==='Loss').length;
+  const wr=total?Math.round(wins/total*100):0;
+
+  // Reliability
+  const sampleScore=Math.min(total/20,1);
+  const confidence=Math.round(wr*0.7+sampleScore*30);
+  const stars=Math.round(confidence/20);
+  const starStr='★'.repeat(stars)+'☆'.repeat(5-stars);
+  const grade=confidence>=80?'A':confidence>=65?'B':confidence>=50?'C':confidence>=35?'D':'—';
+
+  // Distributions
+  const finishes={},behaviors={},trigWR={};
+  matched.forEach(e=>{
+    const cl=e.state&&e.state['closing']?e.state['closing'][0]:'';
+    const bh=e.state&&e.state['closing-behavior']?e.state['closing-behavior'][0]:'';
+    const tr=e.state&&e.state['best-trigger']?e.state['best-trigger'][0]:'';
+    const outcome=e.state&&e.state['trade-outcome']?e.state['trade-outcome'][0]:'';
+    if(cl) finishes[cl]=(finishes[cl]||0)+1;
+    if(bh) behaviors[bh]=(behaviors[bh]||0)+1;
+    if(tr){
+      if(!trigWR[tr]) trigWR[tr]={w:0,t:0};
+      trigWR[tr].t++;
+      if(outcome==='Win') trigWR[tr].w++;
+    }
+  });
+
+  // Trigger intel
+  const trigList=Object.entries(trigWR).filter(([,v])=>v.t>=2)
+    .map(([k,v])=>({k,wr:Math.round(v.w/v.t*100),t:v.t})).sort((a,b)=>b.wr-a.wr);
+  const bestTrig=trigList[0]||null;
+  const worstTrig=trigList.length>1?trigList[trigList.length-1]:null;
+
+  // Failure pattern
+  const lossEntries=matched.filter(e=>e.state&&e.state['trade-outcome']&&e.state['trade-outcome'][0]==='Loss');
+  const failFinishes={},failTriggers={};
+  lossEntries.forEach(e=>{
+    const cl=e.state&&e.state['closing']?e.state['closing'][0]:'';
+    const tr=e.state&&e.state['best-trigger']?e.state['best-trigger'][0]:'';
+    if(cl) failFinishes[cl]=(failFinishes[cl]||0)+1;
+    if(tr) failTriggers[tr]=(failTriggers[tr]||0)+1;
+  });
+  const topFailure=Object.entries(failFinishes).sort((a,b)=>b[1]-a[1])[0]||null;
+  const topFailTrig=Object.entries(failTriggers).sort((a,b)=>b[1]-a[1])[0]||null;
+  const topFinish=Object.entries(finishes).sort((a,b)=>b[1]-a[1])[0]||null;
+
+  // Typical path
+  function topVal(key){const m={};matched.forEach(e=>{const v=e.state&&e.state[key]?e.state[key][0]:'';if(v)m[v]=(m[v]||0)+1;});const s=Object.entries(m).sort((a,b)=>b[1]-a[1]);return s.length?s[0][0]:'';}
+  const typLevel=topVal('strongest-lvl'),typTrig=topVal('best-trigger'),typTarget=topVal('first-target');
+  const typTargetResp=topVal('target-resp'),typClose=topVal('closing');
+  const typPct=total?Math.round(matched.filter(e=>(e.state&&e.state['closing']?e.state['closing'][0]:'')=== typClose).length/total*100):0;
+  const typPathSteps=[typLevel,typTrig,typTarget&&typTargetResp?`${typTarget} ${typTargetResp}`:(typTarget||typTargetResp),typClose].filter(Boolean);
+
+  // Statistical edge: WR vs baseline 50%
+  const edge=wr-50;
+  const edgeStr=(edge>=0?'+':'')+edge+'%';
+
+  // Pattern age
+  const allDates=matched.map(e=>e.date).sort();
+  const firstSeen=allDates[0]?new Date(allDates[0]+'T12:00:00').toLocaleDateString('en-US',{month:'short',year:'numeric'}):'—';
+  const latestSeen=allDates[allDates.length-1]?new Date(allDates[allDates.length-1]+'T12:00:00').toLocaleDateString('en-US',{month:'short',year:'numeric'}):'—';
+
+  // Distribution rows
+  function distRows(obj){
+    const t=Object.values(obj).reduce((a,b)=>a+b,0);
+    return Object.entries(obj).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
+      <div class="pid-exp-row">
+        <div class="pid-exp-pct">${Math.round(v/t*100)}%</div>
+        <div style="flex:1"><div class="pid-exp-lbl">${k}</div><div class="pid-exp-bar"><div class="pid-exp-fill" style="width:${Math.round(v/t*100)}%"></div></div></div>
+        <div style="font-size:10px;color:var(--txt3);margin-left:8px">${v}×</div>
+      </div>`).join('');
+  }
+
+  // PID abbreviation decode — used for tappable tooltips on the header
+  const PID_DECODE={
+    'ORL':'Opening Range Low','ORH':'Opening Range High','PDH':'Prev Day High','PDL':'Prev Day Low',
+    'ONH':'Overnight High','ONL':'Overnight Low','PWH':'Prev Week High','PWL':'Prev Week Low',
+    'DH':'Daily High','DL':'Daily Low','WH':'Weekly High','WL':'Weekly Low',
+    'LS':'Liquidity Sweep','WR':'Wick Rejection','BR':'Break + Retest','EG':'Engulf',
+    'DP':'Displacement','FB':'Fib Retrace',
+    'PA':'PDH Accepted','PR':'PDH Rejected','OA':'ON Accepted','OR':'ON Rejected',
+    'WA':'Weekly Accepted','DA':'Daily Accepted',
+    'NH':'Near High','NL':'Near Low','MR':'Mid-Range',
+    'T':'Trending','B':'Balancing','R':'Rejecting','E':'Exhausting',
+  };
+  // Build tappable PID parts for the header
+  const pidParts=pid.split('-');
+  const pidTappable=pidParts.map(p=>`<span class="pid-part-tip" title="${PID_DECODE[p]||p}">${p}</span>`).join('<span style="color:var(--txt3);padding:0 2px">-</span>');
+
+  // History
+  const sortedEntries=[...matched].sort((a,b)=>b.date.localeCompare(a.date));
+  const lastDates=sortedEntries.slice(0,6).map((e,i)=>{
+    const dt=new Date(e.date+'T12:00:00');
+    const fmt=dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    return `<div class="pid-last-date${i===0?' newest':''}">${i===0?'<span class="pid-last-star">★</span> ':''} ${fmt}</div>`;
+  }).join('');
+
+  const recentsHTML=sortedEntries.slice(0,5).map(e=>{
+    const dt=new Date(e.date+'T12:00:00');
+    const fmt=dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    const outcome=e.state&&e.state['trade-outcome']?e.state['trade-outcome'][0]:'';
+    const pillClass=outcome==='Win'?'win':outcome==='Loss'?'loss':'be';
+    const ePid=buildPatternId(e);
+    return `<div class="pid-recent-row" onclick="closePidModal();loadEntry('${e.id}')">
+      <div>
+        <div class="pid-recent-date">${fmt}</div>
+        <div class="pid-recent-pid" onclick="event.stopPropagation();openPidModal('${ePid}')" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">${ePid}</div>
+      </div>
+      <span class="pid-outcome-pill ${pillClass}">${(outcome||'—').toUpperCase()}</span>
+    </div>`;
+  }).join('');
+
+  // Crew Intelligence Brief — dynamic, behavior-focused, analyst language throughout
+  const topFinishName = topFinish ? topFinish[0] : '';
+  const topFinishPct  = topFinish && total ? Math.round(topFinish[1]/total*100) : 0;
+  const trigPhrase    = bestTrig ? `Following a ${bestTrig.k}` : '';
+
+  let briefLine1 = '';
+  if(wr >= 75){
+    briefLine1 = `Historically resolved ${topFinishName||'as expected'} in ${topFinishPct}% of observed sessions. Observed in ${total} session${total!==1?'s':''}.`;
+  } else if(wr >= 58){
+    briefLine1 = `Historically resolved ${topFinishName||'as expected'} in ${topFinishPct}% of ${total} observed session${total!==1?'s':''}. Confirmation is still required before commitment.`;
+  } else if(wr >= 42){
+    briefLine1 = `Mixed behavior across ${total} session${total!==1?'s':''}. ${topFinishPct}% resolved ${topFinishName||'as expected'} — no strong directional tendency identified. Additional confluence required.`;
+  } else {
+    briefLine1 = `No consistent directional tendency identified across ${total} session${total!==1?'s':''}. Additional observations required.`;
+  }
+
+  const briefLine2 = topFailTrig && topFailure
+    ? `Most failures begin with ${topFailTrig[0]} rejection and finish ${topFailure[0].toLowerCase()}.`
+    : topFailTrig
+    ? `Most failures are preceded by ${topFailTrig[0]} as the entry trigger.`
+    : total < 5
+    ? `Insufficient data to identify a failure pattern — continue logging sessions.`
+    : '';
+
+  idEl.innerHTML=pidTappable;
+  idEl.onclick=()=>copyPid(pid);
+  subEl.textContent='Case File · tap to copy';
+
+  // Build structured data context for Crew Analyst adaptive summary (used when total >= 8)
+  const briefContext = {
+    pid, total, topFinishName, topFinishPct,
+    trigPhrase, bestTrig: bestTrig?.k||'', worstTrig: worstTrig?.k||'',
+    topFailTrig: topFailTrig?.[0]||'', topFailure: topFailure?.[0]||'',
+    wr, losses
+  };
+
+  bodyEl.innerHTML=`
+
+    <div class="pid-case-summary">
+      <div class="pid-case-summary-lbl">Crew Intelligence Brief</div>
+      ${total >= 8
+        ? `<div class="pid-brief-ai" id="pid-brief-ai">
+             <span class="pid-brief-loading">Searching pattern archive…</span>
+           </div>`
+        : `<div class="pid-case-summary-line">${briefLine1}</div>
+           ${briefLine2?`<div class="pid-case-summary-line">${briefLine2}</div>`:''}`
+      }
+    </div>
+
+
+  idEl.innerHTML=pidTappable;
+  idEl.onclick=()=>copyPid(pid);
+  subEl.textContent='Case File · tap to copy';
+
+  bodyEl.innerHTML=`
+
+    <div class="pid-case-summary">
+      <div class="pid-case-summary-lbl">Crew Intelligence Brief</div>
+      <div class="pid-case-summary-line">${briefLine1}</div>
+      ${briefLine2?`<div class="pid-case-summary-line">${briefLine2}</div>`:''}
+    </div>
+
+    <div class="pid-cf-section">
+      <div class="pid-cf-lbl">Expectation — What usually happens?</div>
+      ${Object.keys(finishes).length
+        ? `<div class="pid-dist-sublbl">Expected Finish</div>${distRows(finishes)}`
+        : '<div style="font-size:11px;color:var(--txt3)">Not enough data yet.</div>'}
+      ${Object.keys(behaviors).length
+        ? `<div class="pid-dist-sublbl" style="margin-top:14px">Expected Close Behavior</div>${distRows(behaviors)}`
+        : ''}
+      ${bestTrig
+        ? `<div class="pid-dist-sublbl" style="margin-top:14px">Highest Probability Entry</div>
+           <div class="pid-intel-line">${bestTrig.k}<span class="pid-intel-stat">${bestTrig.wr}% win rate</span></div>`
+        : ''}
+      ${worstTrig&&worstTrig.k!==bestTrig?.k
+        ? `<div class="pid-dist-sublbl" style="margin-top:10px">⚠ Watch For</div>
+           <div class="pid-intel-line warn">${worstTrig.k}<span class="pid-intel-stat">${worstTrig.wr}% win rate — historically underperforms</span></div>`
+        : ''}
+    </div>
+
+    ${typPathSteps.length>=2?`
+    <div class="pid-cf-section">
+      <div class="pid-cf-lbl">Typical Path — How does it unfold?</div>
+      <div class="pid-path-inline">${typPathSteps.join(' → ')}</div>
+      <div class="pid-path-pct">Observed in ${typPct}% of occurrences</div>
+    </div>`:''}
+
+    <div class="pid-cf-section">
+      <div class="pid-cf-lbl">Reliability — Can I trust it?</div>
+      <div class="pid-conf">
+        <div class="pid-conf-stars">${starStr}</div>
+        <div class="pid-conf-metrics">
+          <div class="pid-conf-row">
+            <span class="pid-conf-metric-lbl">Pattern Confidence</span>
+            <span class="pid-conf-metric-val" style="color:var(--gold)">${confidence}%</span>
+          </div>
+          <div class="pid-conf-row">
+            <span class="pid-conf-metric-lbl pid-edge-tip" title="Win Rate minus 50% baseline — measures how much this pattern outperforms a coin flip">Statistical Edge ⓘ</span>
+            <span class="pid-conf-metric-val ${edge>=0?'pos':'neg'}">${edgeStr}</span>
+          </div>
+          <div class="pid-conf-row">
+            <span class="pid-conf-metric-lbl">Sample</span>
+            <span class="pid-conf-metric-val">${total} sessions</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pid-cf-section">
+      <div class="pid-cf-lbl">Performance — How often has it worked?</div>
+      <div class="pid-modal-stats">
+        <div class="pid-ms"><div class="pid-ms-num">${total}</div><div class="pid-ms-lbl">Occurrences</div></div>
+        <div class="pid-ms"><div class="pid-ms-num">${wr}%</div><div class="pid-ms-lbl">Win Rate</div></div>
+        <div class="pid-ms"><div class="pid-ms-num">${wins}</div><div class="pid-ms-lbl">Wins</div></div>
+        <div class="pid-ms"><div class="pid-ms-num">${losses}</div><div class="pid-ms-lbl">Losses</div></div>
+      </div>
+    </div>
+
+    ${topFailure||topFailTrig?`
+    <div class="pid-cf-section">
+      <div class="pid-cf-lbl">Failure Pattern — What breaks it?</div>
+      <div class="pid-failure">
+        ${topFailTrig?`<div class="pid-failure-trigger">Most Common Failure Trigger</div>
+          <div class="pid-failure-close">${topFailTrig[0]}</div>
+          <div class="pid-failure-stat">Observed in ${topFailTrig[1]} losing session${topFailTrig[1]>1?'s':''}.</div>`:''}
+        ${topFailure?`<div class="pid-failure-trigger" style="margin-top:10px">Typical Finish</div>
+          <div class="pid-failure-close" style="font-size:13px">${topFailure[0]}</div>
+          <div class="pid-failure-stat">${Math.round(topFailure[1]/total*100)}% of sessions.</div>`:''}
+        <div class="pid-failure-note">Watch for rejection before commitment.</div>
+      </div>
+    </div>`:''}
+
+    <div class="pid-cf-section">
+      <div class="pid-cf-lbl">Historical Occurrences</div>
+      <div class="pid-age-row">
+        <div class="pid-age-item"><div class="pid-age-lbl">First Seen</div><div class="pid-age-val">${firstSeen}</div></div>
+        <div class="pid-age-item"><div class="pid-age-lbl">Most Recent</div><div class="pid-age-val">${latestSeen}</div></div>
+        <div class="pid-age-item"><div class="pid-age-lbl">Occurrences</div><div class="pid-age-val">${total}×</div></div>
+      </div>
+      <div class="pid-dist-sublbl" style="margin-top:14px">Last Seen</div>
+      <div class="pid-last-seen">${lastDates}</div>
+      <div class="pid-dist-sublbl" style="margin-top:16px">Recent Sessions</div>
+      <div class="pid-recents">${recentsHTML}</div>
+    </div>
+  `;
+
+  overlay.classList.add('open');
+  document.body.style.overflow='hidden';
+
+  // Adaptive Crew Analyst brief — fires when sufficient data exists
+  if(total >= 8){
+    const aiEl = document.getElementById('pid-brief-ai');
+    if(aiEl){
+      const sessionData = matched.map(e=>{
+        function gv(k){ return e.state&&e.state[k]?e.state[k][0]:''; }
+        return {
+          date: e.date,
+          outcome: gv('trade-outcome'),
+          tokyoDir: gv('tokyo-dir'),
+          londonDir: gv('london-dir'),
+          closing: gv('closing'),
+          closingBeh: gv('closing-behavior'),
+          trigger: gv('best-trigger'),
+          orOutcome: gv('or-outcome'),
+          openDrive: gv('opening-drive'),
+          retracement: gv('retracement'),
+          largest: gv('largest-exp'),
+          pmStructure: gv('pm-structure'),
+          first5: gv('first5'),
+          nyHtf: gv('ny-htf'),
+        };
+      });
+
+      const sampleThreshold = total >= 50 ? 'Strong historical tendency'
+        : total >= 25 ? 'Consistent historical relationship'
+        : total >= 10 ? 'Emerging tendency'
+        : total >= 5  ? 'Possible relationship observed'
+        : 'Insufficient data';
+
+      const prompt = `You are the Crew Analyst for a professional futures scalping journal (YM/NQ micro futures, NY session 6:30–8 AM PST). Your role is to discover relationships in trading data — not summarize statistics.
+
+PATTERN: ${briefContext.pid}
+SESSIONS: ${briefContext.total}
+SAMPLE CONFIDENCE THRESHOLD: ${sampleThreshold}
+
+SESSION DATA:
+${JSON.stringify(sessionData, null, 1)}
+
+RESEARCH DIRECTIVE:
+Analyze these sessions. Identify only statistically meaningful relationships between session variables and outcome. Do not write fluff or restate aggregate numbers.
+
+PRIORITIZE these as potential filters:
+1. Tokyo + London directional alignment
+2. Opening Drive type (Expansion Up/Down vs Rotation vs Balance)
+3. OR outcome and first 5-min candle direction
+4. Retracement depth correlation with finish
+5. Pre-market structure
+6. Any combination of filters that dramatically changes expectation
+
+RULES:
+- Only report relationships where winning and losing sessions differ meaningfully
+- Do NOT infer from fewer than 5 occurrences — state "insufficient data"
+- If a variable appears equally in wins and losses, note it is NOT a predictor
+- If you find a filter combination that changes expectation dramatically, report it
+- Never say "win rate" — use behavioral language ("resolved Near High", "finished as expected")
+- No preamble, no markdown, no bullet points
+
+Respond ONLY with valid JSON, no other text:
+{"primary":{"finding":"","confidence":"High"},"secondary":{"finding":"","confidence":"Moderate"},"weak":{"finding":"","confidence":"Low"},"contradiction":"","combination":""}
+
+Use empty string for any section with no meaningful finding.`;
+
+      fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          model:'claude-sonnet-4-6',
+          max_tokens:600,
+          messages:[{role:'user',content:prompt}]
+        })
+      }).then(r=>r.json()).then(d=>{
+        const raw=(d.content||[]).map(c=>c.text||'').join('').trim();
+        if(!raw||!aiEl) return;
+        let findings;
+        try{
+          findings=JSON.parse(raw.replace(/```json|```/g,'').trim());
+        } catch(e){
+          aiEl.innerHTML=raw.split(/\n+/).filter(Boolean)
+            .map(s=>`<span class="pid-case-summary-line" style="display:block;margin-bottom:6px">${s}</span>`).join('');
+          return;
+        }
+
+        // Overall Bias
+        const biasDir = topFinishName==='Near High' ? 'Bullish Continuation'
+          : topFinishName==='Near Low' ? 'Bearish Continuation'
+          : topFinishName==='Mid-Range' ? 'Balanced / No Edge'
+          : 'Review Data';
+        const biasColor = topFinishName==='Near High'?'green':topFinishName==='Near Low'?'red':'';
+
+        // Timestamp for discoveries
+        const lastUpdated = sortedEntries[0]
+          ? new Date(sortedEntries[0].date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
+          : '—';
+
+        const scorecard = `<div class="pid-scorecard">
+          <div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Overall Bias</span><span class="pid-scorecard-val ${biasColor}">${biasDir}</span></div>
+          <div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Pattern Confidence</span><span class="pid-scorecard-val ${scorecardConfColor}">${confidence}% · ${scorecardConf}</span></div>
+          <div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Expected Finish</span><span class="pid-scorecard-val gold">${topFinishName||'—'} (${topFinishPct}%)</span></div>
+          ${bestTrig?`<div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Expected Entry</span><span class="pid-scorecard-val">${bestTrig.k}</span></div>`:''}
+          ${topFailTrig?`<div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Risk Trigger</span><span class="pid-scorecard-val red">${topFailTrig[0]}</span></div>`:''}
+          <div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Sample Size</span><span class="pid-scorecard-val">${total} Sessions</span></div>
+        </div>`;
+
+        // Findings — clean, no timestamps
+        let html = scorecard;
+
+        if(findings.primary?.finding){
+          html+=`<div class="pid-finding pid-finding-high">
+            <div class="pid-finding-conf">Primary Observation</div>
+            <div class="pid-finding-text">${findings.primary.finding}</div>
+            <div class="pid-finding-meta">Evidence Quality · ${findings.primary.confidence} &nbsp;·&nbsp; n = ${total}</div>
+          </div>`;
+          const sentences=findings.primary.finding.match(/[^.!?]+[.!?]+/g)||[];
+          const interpretation=sentences.length>1?sentences.slice(1).join(' ').trim():'';
+          if(interpretation){
+            html+=`<div class="pid-finding pid-finding-assessment">
+              <div class="pid-finding-conf">Crew Assessment</div>
+              <div class="pid-finding-text pid-assessment-italic">Historical evidence suggests ${interpretation.replace(/^[A-Z]/,c=>c.toLowerCase())}</div>
+            </div>`;
+          }
+        }
+
+        let supporting=0;
+        if(findings.secondary?.finding && supporting<2){
+          html+=`<div class="pid-finding pid-finding-mid">
+            <div class="pid-finding-conf">Supporting Observation</div>
+            <div class="pid-finding-text">${findings.secondary.finding}</div>
+            <div class="pid-finding-meta">Evidence Quality · ${findings.secondary.confidence||'Moderate'} &nbsp;·&nbsp; n = ${total}</div>
+          </div>`;
+          supporting++;
+        }
+        if(findings.weak?.finding && supporting<2){
+          html+=`<div class="pid-finding pid-finding-low">
+            <div class="pid-finding-conf">Supporting Observation · Low Confidence</div>
+            <div class="pid-finding-text">${findings.weak.finding}</div>
+            <div class="pid-finding-meta">Evidence Quality · Low &nbsp;·&nbsp; n = ${total}</div>
+          </div>`;
+          supporting++;
+        }
+        if(findings.contradiction){
+          html+=`<div class="pid-finding pid-finding-low">
+            <div class="pid-finding-conf">Negative Finding</div>
+            <div class="pid-finding-text">${findings.contradiction}</div>
+          </div>`;
+        }
+        if(findings.combination){
+          const comboText=findings.combination;
+          const colonIdx=comboText.indexOf(':');
+          let conditionsHTML='',outcomeHTML='';
+          if(colonIdx>-1){
+            const conditions=comboText.slice(0,colonIdx).split(/\+|and/i).map(s=>s.trim()).filter(Boolean);
+            const outcome=comboText.slice(colonIdx+1).trim();
+            // Try to extract "X of Y" and finish label
+            const match=outcome.match(/(\d+)\s*of\s*(\d+)\s*(.*)/i);
+            if(match){
+              outcomeHTML=`<div class="pid-combo-lbl" style="margin-top:10px">Outcome</div>
+                <div class="pid-combo-outcome-big">${match[1]} / ${match[2]}</div>
+                <div class="pid-combo-outcome-lbl">${match[3].trim()||'Sessions'}</div>`;
+            } else {
+              outcomeHTML=`<div class="pid-combo-lbl" style="margin-top:8px">Observed:</div><div class="pid-combo-outcome">${outcome}</div>`;
+            }
+            conditionsHTML=`<div class="pid-combo-lbl">When:</div>${conditions.map(c=>`<div class="pid-combo-condition">· ${c}</div>`).join('')}`;
+          } else {
+            conditionsHTML=`<div class="pid-finding-text">${comboText}</div>`;
+          }
+          html+=`<div class="pid-finding pid-finding-combo-card">
+            <div class="pid-finding-conf">Highest Edge Filter</div>
+            ${conditionsHTML}${outcomeHTML}
+          </div>`;
+        }
+        if(aiEl) aiEl.innerHTML=html||`${scorecard}<span class="pid-brief-loading">No significant relationships identified at this sample size.</span>`;
+      }).catch(()=>{
+        if(aiEl) aiEl.innerHTML=`<span class="pid-case-summary-line">${briefLine1}</span>${briefLine2?`<span class="pid-case-summary-line" style="display:block;margin-top:5px">${briefLine2}</span>`:''}`;
+      });
+    }
+  }
+}
+
+function closePidModal(){
+  const overlay=document.getElementById('pid-modal-overlay');
+  if(overlay) overlay.classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function copyPid(pid){
+  navigator.clipboard.writeText(pid).then(()=>{
+    // brief flash feedback
+    const btns=document.querySelectorAll('.pid-copy-btn');
+    btns.forEach(b=>{ if(b.onclick&&b.onclick.toString().includes(pid)){ b.textContent='Copied!'; setTimeout(()=>b.textContent='Copy',1200); }});
+  }).catch(()=>{});
 }
 
 const _origBuildState = buildState;
