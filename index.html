@@ -309,6 +309,13 @@ font-size:13px;color:var(--gold);font-weight:600;margin-top:4px;display:flex;ali
 .btn-big{width:100%;padding:14px;border-radius:10px;border:1px solid var(--gold);background:rgba(201,168,76,0.08);color:var(--gold);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:0.04em;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
 .btn-big:active{background:rgba(201,168,76,0.18)}
 .pattern-grid-csv{margin-top:16px}
+.pgc-card-seq{background:rgba(201,168,76,0.06);border-color:rgba(201,168,76,0.3)}
+.pgc-seq-blueprint{font-size:13px;font-weight:600;color:var(--gold);line-height:1.5;margin:8px 0 4px}
+.pgc-seq-pct{font-size:10px;color:var(--txt3);margin-bottom:10px}
+.pgc-seq-outcome{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(201,168,76,0.04);border:0.5px solid rgba(201,168,76,0.15);border-radius:7px}
+.pgc-seq-outcome-lbl{font-size:9px;color:var(--txt3);letter-spacing:0.07em;text-transform:uppercase;font-weight:600;flex:1}
+.pgc-seq-outcome-val{font-size:12px;color:var(--txt);font-weight:600}
+.pgc-seq-outcome-pct{font-size:14px;color:var(--gold);font-weight:700}
 .pgc-title{font-size:11px;color:var(--txt3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;font-weight:600}
 .pgc-card{background:var(--navy3);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px}
 .pgc-lbl{font-size:11px;color:var(--txt2);margin-bottom:4px}
@@ -1005,7 +1012,7 @@ const PMAP=[
   ['open-loc','Open Location'],['first5','First 5-Min'],['opening-drive','Opening Drive'],
   ['first-liq','First Liq'],['first-target','First Target'],
   ['target-resp','Target Response'],['30min-close','30-Min Close'],
-  ['or-outcome','OR Outcome'],['7-8-behavior','7–8 Behavior'],
+  ['or-outcome','OR Outcome'],['7-8-behavior','7 8 Behavior'],
   ['or-confirm','OR Confirm'],['strongest-lvl','Strongest Level'],
   ['largest-exp','Largest Expansion'],['move-dir','Direction'],
   ['retracement','Retracement'],['closing','Close Condition'],['closing-behavior','Closing Behavior'],
@@ -1108,7 +1115,7 @@ function getV(g){
 function updatePB(){
   const g=document.getElementById('pb-grid');
   if(!g) return;
-  g.innerHTML=PMAP.map(([k,l])=>`<div class="pb-row"><span class="pk">${l}</span><span class="pv">${getV(k)||'—'}</span></div>`).join('');
+  g.innerHTML=PMAP.map(([k,l])=>`<div class="pb-row"><span class="pk">${l}</span><span class="pv">${getV(k)||' '}</span></div>`).join('');
 }
 
 function triggerFile(k){document.getElementById('fi-'+k).click();}
@@ -1148,7 +1155,7 @@ function saveEntry(){
   const entry={
     id:Date.now(),date,
     mkt:mkts[activeMkt].name,
-    instrument:state.__instrument||'—',
+    instrument:state.__instrument||' ',
     state,attach,
     savedAt:new Date().toISOString()
   };
@@ -1159,7 +1166,7 @@ function saveEntry(){
   updateEntryBadge();
   const btn=document.querySelector('#journal-actions .primary');
   const orig=btn.textContent;
-  btn.textContent='Saved ✓';
+  btn.textContent='Saved  ';
   btn.style.color='#4ade80';btn.style.borderColor='#4ade80';
   setTimeout(()=>{btn.textContent=orig;btn.style.color='';btn.style.borderColor='';},1800);
 }
@@ -1290,11 +1297,11 @@ function renderHistory(){
       const wr=total?Math.round(wins/total*100):0;
       const pidLabel=matchedPids.length===1?matchedPids[0]:search+'*';
       const finishRows=Object.entries(finishBreak).sort((a,b)=>b[1]-a[1])
-        .map(([k,v])=>`<div class="pid-break-row"><span>${k}</span><span>${v}× (${Math.round(v/total*100)}%)</span></div>`).join('');
+        .map(([k,v])=>`<div class="pid-break-row"><span>${k}</span><span>${v}  (${Math.round(v/total*100)}%)</span></div>`).join('');
       const behavRows=Object.entries(behavBreak).sort((a,b)=>b[1]-a[1])
-        .map(([k,v])=>`<div class="pid-break-row"><span>${k}</span><span>${v}× (${Math.round(v/total*100)}%)</span></div>`).join('');
+        .map(([k,v])=>`<div class="pid-break-row"><span>${k}</span><span>${v}  (${Math.round(v/total*100)}%)</span></div>`).join('');
       statsPanel.innerHTML=`<div class="pid-stats">
-        <div class="pid-stats-id">📊 ${pidLabel}</div>
+        <div class="pid-stats-id">  ${pidLabel}</div>
         <div class="pid-stats-grid">
           <div class="pid-stat"><div class="pid-stat-num">${total}</div><div class="pid-stat-lbl">Occurrences</div></div>
           <div class="pid-stat"><div class="pid-stat-num">${wr}%</div><div class="pid-stat-lbl">Win Rate</div></div>
@@ -1340,16 +1347,16 @@ function renderHistory(){
 
     const confParts=[pa, target&&tResp?`${target} ${tResp}`:(target||tResp)].filter(Boolean);
     const confPart=confParts.join(' + ');
-    const finishPart=[closing,closingBeh].filter(Boolean).join(' · ');
+    const finishPart=[closing,closingBeh].filter(Boolean).join('   ');
 
     // Pill-style Blueprint segments
     const bpSegs=[
       level   ? `<span class="hc-bp-pill lvl">${level}</span>` : '',
-      trigger ? `<span class="hc-bp-arrow">→</span><span class="hc-bp-pill">${trigger}</span>` : '',
-      confPart? `<span class="hc-bp-arrow">→</span><span class="hc-bp-pill">${confPart}</span>` : '',
-      finishPart?`<span class="hc-bp-arrow">→</span><span class="hc-bp-pill">${finishPart}</span>` : '',
+      trigger ? `<span class="hc-bp-arrow"> </span><span class="hc-bp-pill">${trigger}</span>` : '',
+      confPart? `<span class="hc-bp-arrow"> </span><span class="hc-bp-pill">${confPart}</span>` : '',
+      finishPart?`<span class="hc-bp-arrow"> </span><span class="hc-bp-pill">${finishPart}</span>` : '',
     ].filter(Boolean);
-    const pillsHTML = bpSegs.length ? `<div class="hc-bp-pills">${bpSegs.join('')}</div>` : '<div style="font-size:11px;color:var(--txt3)">—</div>';
+    const pillsHTML = bpSegs.length ? `<div class="hc-bp-pills">${bpSegs.join('')}</div>` : '<div style="font-size:11px;color:var(--txt3)"> </div>';
 
     const patternId=buildPatternId(e);
     const ps=patternId&&pidMap[patternId]?pidMap[patternId]:null;
@@ -1361,14 +1368,14 @@ function renderHistory(){
     let pidHTML='';
     if(patternId){
       const cnt = ps ? ps.count : 1;
-      const lastDates = ps && ps.dates ? ps.dates.slice(-3).reverse().map(d=>new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})).join(' · ') : '';
+      const lastDates = ps && ps.dates ? ps.dates.slice(-3).reverse().map(d=>new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})).join('   ') : '';
       pidHTML=`<div class="hc-pid-row">
         <span class="hc-pid"
           onclick="event.stopPropagation();openPidModal('${patternId}')"
           oncontextmenu="event.preventDefault();event.stopPropagation();copyPid('${patternId}')"
         >${patternId}</span>
-        <span class="hc-pid-count">${cnt>1?`${cnt}×`:''}</span>
-        ${lastDates&&cnt>1?`<span class="hc-pid-last">Last: ${lastDates.split(' · ')[0]}</span>`:''}
+        <span class="hc-pid-count">${cnt>1?`${cnt} `:''}</span>
+        ${lastDates&&cnt>1?`<span class="hc-pid-last">Last: ${lastDates.split('   ')[0]}</span>`:''}
       </div>`;
     }
 
@@ -1442,14 +1449,14 @@ function copyCSV(){
   navigator.clipboard.writeText(buildCSV()).then(()=>{
     const btn=document.querySelectorAll('.btn-big')[1];
     const orig=btn.innerHTML;
-    btn.innerHTML='Copied ✓';
+    btn.innerHTML='Copied  ';
     setTimeout(()=>btn.innerHTML=orig,1800);
   }).catch(()=>{});
 }
 
 function renderPatterns(){
   const body=document.getElementById('pattern-analysis');
-  if(!entries.length){body.innerHTML='<div style="font-size:12px;color:var(--txt3);text-align:center;padding:20px 0">No data yet — save entries to see patterns.</div>';return;}
+  if(!entries.length){body.innerHTML='<div style="font-size:12px;color:var(--txt3);text-align:center;padding:20px 0">No data yet -- save entries to see patterns.</div>';return;}
   function freq(field){
     const counts={};
     entries.forEach(e=>{
@@ -1461,21 +1468,68 @@ function renderPatterns(){
     return Object.entries(counts).sort((a,b)=>b[1]-a[1]);
   }
   const n=entries.length;
+
+  // Highest Probability Sequence — build full blueprint from most common values
+  function topVal(field){const f=freq(field);return f.length?f[0][0]:'';}
+  const seqLevel  = topVal('strongest-lvl');
+  const seqTrig   = topVal('best-trigger');
+  const seqTarget = topVal('first-target');
+  const seqTResp  = topVal('target-resp');
+  const seqClose  = topVal('closing');
+  const seqBehav  = topVal('closing-behavior');
+
+  // Count how many entries match this sequence (at least level + trig + close)
+  const seqMatches = entries.filter(e=>{
+    const gv=k=>e.state&&e.state[k]?e.state[k][0]:'';
+    return (!seqLevel||gv('strongest-lvl')===seqLevel)&&
+           (!seqTrig||gv('best-trigger')===seqTrig)&&
+           (!seqClose||gv('closing')===seqClose);
+  }).length;
+  const seqPct = n?Math.round(seqMatches/n*100):0;
+
+  // Most common close behavior within those matches
+  const behavInSeq={};
+  entries.filter(e=>{
+    const gv=k=>e.state&&e.state[k]?e.state[k][0]:'';
+    return (!seqLevel||gv('strongest-lvl')===seqLevel)&&(!seqClose||gv('closing')===seqClose);
+  }).forEach(e=>{
+    const b=e.state&&e.state['closing-behavior']?e.state['closing-behavior'][0]:'';
+    if(b) behavInSeq[b]=(behavInSeq[b]||0)+1;
+  });
+  const topBehav=Object.entries(behavInSeq).sort((a,b)=>b[1]-a[1])[0];
+  const behavPct=topBehav&&seqMatches?Math.round(topBehav[1]/seqMatches*100):0;
+
+  const seqParts=[seqLevel,seqTrig,seqTarget&&seqTResp?`${seqTarget} ${seqTResp}`:(seqTarget||seqTResp),seqClose].filter(Boolean);
+  const seqHTML = seqParts.length >= 2 ? `
+    <div class="pgc-card pgc-card-seq">
+      <div class="pgc-lbl">Highest Probability Sequence</div>
+      <div class="pgc-seq-blueprint">${seqParts.join(' -- ')}</div>
+      <div class="pgc-seq-pct">Occurred in ${seqPct}% of sessions (${seqMatches} of ${n})</div>
+      ${topBehav?`<div class="pgc-seq-outcome">
+        <span class="pgc-seq-outcome-lbl">Expected Close</span>
+        <span class="pgc-seq-outcome-val">${topBehav[0]}</span>
+        <span class="pgc-seq-outcome-pct">${behavPct}%</span>
+      </div>`:''}
+    </div>` : '';
+
   function topCard(label,field){
     const f=freq(field);
     if(!f.length) return '';
     const rows=f.slice(0,4).map(([v,c])=>`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:0.5px solid rgba(201,168,76,0.08);font-size:11px"><span style="color:var(--txt2)">${v}</span><span style="color:var(--gold);font-weight:600">${Math.round(c/n*100)}% (${c})</span></div>`).join('');
     return `<div class="pgc-card"><div class="pgc-lbl">${label}</div>${rows}</div>`;
   }
+
   body.innerHTML=`
-    <div class="pgc-title">Frequency analysis — ${n} sessions</div>
+    <div class="pgc-title">Frequency analysis -- ${n} sessions</div>
+    ${seqHTML}
     ${topCard('Direction','move-dir')}
     ${topCard('Strongest level','strongest-lvl')}
     ${topCard('OR outcome','or-outcome')}
     ${topCard('Best entry trigger','best-trigger')}
     ${topCard('Deepest retracement','retracement')}
     ${topCard('Closing condition','closing')}
-    ${topCard('7–8 AM behavior','7-8-behavior')}
+    ${topCard('Closing behavior','closing-behavior')}
+    ${topCard('7-8 AM behavior','7-8-behavior')}
     ${topCard('First liquidity taken','first-liq')}
     ${topCard('Tokyo direction','tokyo-dir')}
     ${topCard('London direction','london-dir')}
@@ -1489,7 +1543,7 @@ document.getElementById('trade-date').value=new Date().toISOString().slice(0,10)
 updatePB();
 
 
-// ── AUTH ──
+// -- AUTH --
 // Passwords are hashed (SHA-256) so they are never stored in plaintext.
 // ADMIN hash  = SHA-256 of "BHC2025admin"
 // VIEWER hash = SHA-256 of "BHCcrew2025"
@@ -1497,7 +1551,7 @@ updatePB();
 const ADMIN_HASH  = 'a7f3e2c1b4d6e8f0a2c4b6d8e0f2a4c6b8d0e2f4a6c8b0d2e4f6a8c0b2d4e6f8';
 const VIEWER_HASH = 'c2f4a6b8d0e2f4a6c8b0d2e4f6a8c0b2d4e6f8a0c2b4d6e8f0a2c4b6d8e0f2a4';
 
-// REAL hashes computed below — the above are placeholders overwritten at runtime
+// REAL hashes computed below   the above are placeholders overwritten at runtime
 const REAL_ADMIN  = '5e3d2a1f4b7c9e0d2a5f8b1e4c7d0a3f6b9e2c5d8a1f4b7c0e3d6a9f2c5b8e1d4';
 const REAL_VIEWER = '8b1e4c7d0a3f6b9e2c5d8a1f4b7c0e3d6a9f2c5b8e1d4a7c0e3f6b9d2a5e8c1b4';
 
@@ -1758,7 +1812,7 @@ window.saveEntry = function() {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-// ── DAY OF WEEK ──
+// -- DAY OF WEEK --
 function updateDayLabel(val) {
   const el = document.getElementById('day-label');
   if (!el) return;
@@ -1773,7 +1827,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (v && v.value) updateDayLabel(v.value);
 });
 
-// ── DASHBOARD ──
+// -- DASHBOARD --
 let dashMkt = 'all';
 const chartInstances = {};
 const GOLD = '#C9A84C';
@@ -1802,7 +1856,7 @@ function getField(entry, key) {
 }
 
 function getDayOfWeek(dateStr) {
-  if (!dateStr) return '—';
+  if (!dateStr) return ' ';
   const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   return days[new Date(dateStr + 'T12:00:00').getDay()];
 }
@@ -1906,14 +1960,14 @@ function renderDashboard() {
     return `<tr>
       <td>${fmt}</td>
       <td>${getDayOfWeek(e.date)}</td>
-      <td style="color:#C9A84C;font-weight:600">${e.mkt||'—'}</td>
-      <td>${getField(e,'move-dir')||'—'}</td>
-      <td style="font-size:10px">${getField(e,'or-outcome')||'—'}</td>
-      <td style="font-size:10px">${getField(e,'strongest-lvl')||'—'}</td>
-      <td style="font-size:10px">${getField(e,'retracement')||'—'}</td>
-      <td style="font-size:10px">${getField(e,'trade-taken')||'—'}</td>
-      <td class="${resultClass}">${outcome||'—'}</td>
-      <td class="${gradeClass}">${grade ? grade[0] : '—'}</td>
+      <td style="color:#C9A84C;font-weight:600">${e.mkt||' '}</td>
+      <td>${getField(e,'move-dir')||' '}</td>
+      <td style="font-size:10px">${getField(e,'or-outcome')||' '}</td>
+      <td style="font-size:10px">${getField(e,'strongest-lvl')||' '}</td>
+      <td style="font-size:10px">${getField(e,'retracement')||' '}</td>
+      <td style="font-size:10px">${getField(e,'trade-taken')||' '}</td>
+      <td class="${resultClass}">${outcome||' '}</td>
+      <td class="${gradeClass}">${grade ? grade[0] : ' '}</td>
     </tr>`;
   }).join('');
 }
@@ -1937,7 +1991,7 @@ window.saveEntry = function() {
   if (dv && dv.classList.contains('active')) renderDashboard();
 };
 
-// ── CREW REPORT ──
+// -- CREW REPORT --
 let crRange = '7d';
 let crCustomFrom = '';
 let crCustomTo = '';
@@ -2015,7 +2069,7 @@ function crFreq(data, key) {
 
 function crTop(data, key) {
   const f = crFreq(data, key);
-  return f.length ? f[0][0] : '—';
+  return f.length ? f[0][0] : ' ';
 }
 
 function crTopN(data, key, n=3) {
@@ -2031,7 +2085,7 @@ function crRangeLabel() {
   if (crRange === 'custom') {
     const f = document.getElementById('cr-from').value;
     const t = document.getElementById('cr-to').value;
-    return f && t ? `${f} → ${t}` : 'Custom Range';
+    return f && t ? `${f} to ${t}` : 'Custom Range';
   }
   return '';
 }
@@ -2042,11 +2096,11 @@ async function generateCrewReport() {
 
   const btn = document.getElementById('cr-gen-btn');
   btn.disabled = true;
-  document.getElementById('cr-gen-label').textContent = 'Running Debrief…';
+  document.getElementById('cr-gen-label').textContent = 'Running Debrief ';
 
   document.getElementById('cr-range-panel').style.display = 'none';
   document.getElementById('cr-report').style.display = 'block';
-  document.getElementById('cr-report-range').textContent = crRangeLabel() + ' · ' + data.length + ' entries';
+  document.getElementById('cr-report-range').textContent = crRangeLabel() + '   ' + data.length + ' entries';
 
   const body = document.getElementById('cr-report-body');
   body.innerHTML = buildCrewReportHTML(data);
@@ -2070,7 +2124,7 @@ function buildCrewReportHTML(data) {
   const wr = trades ? Math.round(wins/trades*100) : 0;
   const aGrades = data.filter(e => (getField(e,'entry-quality')||'').startsWith('A')).length;
   const bGrades = data.filter(e => (getField(e,'entry-quality')||'').startsWith('B')).length;
-  const avgGrade = trades ? ((aGrades*3 + bGrades*2 + (trades-aGrades-bGrades)*1)/trades).toFixed(1) : '—';
+  const avgGrade = trades ? ((aGrades*3 + bGrades*2 + (trades-aGrades-bGrades)*1)/trades).toFixed(1) : ' ';
 
   // Crew Intel
   const bestSetup = crTop(data, 'best-trigger');
@@ -2081,7 +2135,7 @@ function buildCrewReportHTML(data) {
       m[k] = (m[k]||0) + 1;
     });
     const s = Object.entries(m).sort((a,b)=>b[1]-a[1]);
-    return s.length ? s[0][0] : '—';
+    return s.length ? s[0][0] : ' ';
   })();
   const bestSession = (() => {
     // Use dh-session as a proxy for best session
@@ -2106,7 +2160,7 @@ function buildCrewReportHTML(data) {
   const sectionMission = `
     <div class="cr-section">
       <div class="cr-section-head">
-        <span class="cr-section-icon">🎯</span>
+        <span class="cr-section-icon"> </span>
         <span class="cr-section-title">Mission Summary</span>
       </div>
       <div class="cr-stat-grid-3" style="margin-bottom:8px">
@@ -2123,7 +2177,7 @@ function buildCrewReportHTML(data) {
   const sectionIntel = `
     <div class="cr-section">
       <div class="cr-section-head">
-        <span class="cr-section-icon">🏦</span>
+        <span class="cr-section-icon"> </span>
         <span class="cr-section-title">Crew Intel</span>
       </div>
       <div class="cr-intel-row"><span class="cr-intel-lbl">Best Setup</span><span class="cr-intel-val gold">${bestSetup}</span></div>
@@ -2137,20 +2191,20 @@ function buildCrewReportHTML(data) {
   const sectionWeakness = `
     <div class="cr-section">
       <div class="cr-section-head">
-        <span class="cr-section-icon">⚠️</span>
+        <span class="cr-section-icon">  </span>
         <span class="cr-section-title">Operational Weaknesses</span>
       </div>
-      ${commonMistake !== '—' ? `<div class="cr-weakness-row"><div class="cr-weakness-lbl">Most Common Mistake</div><div class="cr-weakness-val">${commonMistake}</div></div>` : ''}
-      ${commonEmotion !== '—' ? `<div class="cr-weakness-row"><div class="cr-weakness-lbl">Emotional Pattern</div><div class="cr-weakness-val">${commonEmotion}</div></div>` : ''}
-      ${commonExecError !== '—' ? `<div class="cr-weakness-row"><div class="cr-weakness-lbl">Execution Error</div><div class="cr-weakness-val">${commonExecError}</div></div>` : ''}
-      ${heatSource !== '—' ? `<div class="cr-weakness-row"><div class="cr-weakness-lbl">Largest Expansion</div><div class="cr-weakness-val">${heatSource}</div></div>` : ''}
-      ${[commonMistake,commonEmotion,commonExecError,heatSource].every(v=>v==='—') ? '<div style="font-size:12px;color:var(--txt3);text-align:center;padding:8px 0">No weakness data in this range yet.</div>' : ''}
+      ${commonMistake !== ' ' ? `<div class="cr-weakness-row"><div class="cr-weakness-lbl">Most Common Mistake</div><div class="cr-weakness-val">${commonMistake}</div></div>` : ''}
+      ${commonEmotion !== ' ' ? `<div class="cr-weakness-row"><div class="cr-weakness-lbl">Emotional Pattern</div><div class="cr-weakness-val">${commonEmotion}</div></div>` : ''}
+      ${commonExecError !== ' ' ? `<div class="cr-weakness-row"><div class="cr-weakness-lbl">Execution Error</div><div class="cr-weakness-val">${commonExecError}</div></div>` : ''}
+      ${heatSource !== ' ' ? `<div class="cr-weakness-row"><div class="cr-weakness-lbl">Largest Expansion</div><div class="cr-weakness-val">${heatSource}</div></div>` : ''}
+      ${[commonMistake,commonEmotion,commonExecError,heatSource].every(v=>v===' ') ? '<div style="font-size:12px;color:var(--txt3);text-align:center;padding:8px 0">No weakness data in this range yet.</div>' : ''}
     </div>`;
 
   const sectionMechanics = `
     <div class="cr-section">
       <div class="cr-section-head">
-        <span class="cr-section-icon">🧠</span>
+        <span class="cr-section-icon"> </span>
         <span class="cr-section-title">Crew Analyst</span>
       </div>
       <div class="cr-ai-block" id="cr-ai-mechanics">
@@ -2158,7 +2212,7 @@ function buildCrewReportHTML(data) {
           <div class="cr-ai-dot"></div>
           <div class="cr-ai-dot"></div>
           <div class="cr-ai-dot"></div>
-          <span style="margin-left:4px">Analyst is reviewing the operations…</span>
+          <span style="margin-left:4px">Analyst is reviewing the operations </span>
         </div>
       </div>
     </div>`;
@@ -2166,7 +2220,7 @@ function buildCrewReportHTML(data) {
   const sectionActions = `
     <div class="cr-section">
       <div class="cr-section-head">
-        <span class="cr-section-icon">📋</span>
+        <span class="cr-section-icon"> </span>
         <span class="cr-section-title">Action Items</span>
       </div>
       <div class="cr-ai-block" id="cr-ai-actions">
@@ -2174,7 +2228,7 @@ function buildCrewReportHTML(data) {
           <div class="cr-ai-dot"></div>
           <div class="cr-ai-dot"></div>
           <div class="cr-ai-dot"></div>
-          <span style="margin-left:4px">Analyst is writing the orders…</span>
+          <span style="margin-left:4px">Analyst is writing the orders </span>
         </div>
       </div>
     </div>`;
@@ -2199,7 +2253,7 @@ function buildAIContext(data) {
     e.state && e.state['ob-q3-why'],
   ].filter(Boolean).join(' | ')).filter(Boolean).slice(0,20).join('\n');
 
-  return `You are analyzing ${n} trading journal entries for a YM/NQ micro futures scalper (NY session, 6:30–8:00 AM PST).
+  return `You are analyzing ${n} trading journal entries for a YM/NQ micro futures scalper (NY session, 6:30 8:00 AM PST).
 
 STRUCTURED DATA:
 - Direction: ${freq('move-dir')}
@@ -2208,7 +2262,7 @@ STRUCTURED DATA:
 - Best trigger: ${freq('best-trigger')}
 - Retracement: ${freq('retracement')}
 - Closing condition: ${freq('closing')}
-- 7–8 AM behavior: ${freq('7-8-behavior')}
+- 7 8 AM behavior: ${freq('7-8-behavior')}
 - First liquidity taken: ${freq('first-liq')}
 - Tokyo direction: ${freq('tokyo-dir')}
 - London direction: ${freq('london-dir')}
@@ -2236,17 +2290,17 @@ async function runAIMarketMechanics(data) {
           role: 'user',
           content: `${ctx}
 
-Based on this data, write 3–5 concise "Market Mechanics" insights — recurring patterns you've observed in this data. Write each as a single sentence starting with a market structure observation. Use trader language. Focus on what the market DID repeatedly. Examples: "London frequently swept liquidity before NY continuation." or "Most profitable sessions occurred after PDH was reclaimed in the first 5 minutes."
+Based on this data, write 3-5 concise "Market Mechanics" insights - recurring patterns you've observed in this data. Write each as a single sentence starting with a market structure observation. Use trader language. Focus on what the market DID repeatedly. Examples: "London frequently swept liquidity before NY continuation." or "Most profitable sessions occurred after PDH was reclaimed in the first 5 minutes."
 
-Return ONLY the insights as a plain bulleted list using • as the bullet. No preamble, no headers, no markdown.`
+Return ONLY the insights as a plain bulleted list using * as the bullet. No preamble, no headers, no markdown.`
         }]
       })
     });
     const d = await res.json();
     const text = (d.content||[]).map(c=>c.text||'').join('').trim();
     if (!text || text.length < 10) throw new Error('empty');
-    const lines = text.split('\n').map(l=>l.trim()).filter(l=>l.startsWith('•')||l.startsWith('-')||l.length>10);
-    el.innerHTML = `<div class="cr-analyst-byline">Based on the previous ${data.length} operation${data.length===1?'':'s'}…</div><div class="cr-ai-text">${lines.map(l=>`<p>${l.replace(/^[•\-]\s*/,'')}</p>`).join('')}</div>`;
+    const lines = text.split('\n').map(l=>l.trim()).filter(l=>l.startsWith(' ')||l.startsWith('-')||l.length>10);
+    el.innerHTML = `<div class="cr-analyst-byline">Based on the previous ${data.length} operation${data.length===1?'':'s'} </div><div class="cr-ai-text">${lines.map(l=>`<p>${l.replace(/^[ \-]\s*/,'')}</p>`).join('')}</div>`;
   } catch(e) {
     el.innerHTML = `<div style="font-size:11px;color:var(--txt3)">Crew Analyst unavailable. Unable to access intelligence engine.</div>`;
   }
@@ -2267,7 +2321,7 @@ async function runAIActionItems(data) {
           role: 'user',
           content: `${ctx}
 
-Based on this trading data, generate exactly 4–5 specific, actionable recommendations for the next trading period. Each should be a concrete behavior change or reinforcement — not vague advice. Write in imperative form. Examples: "Continue prioritizing Inside Job setups at HTF liquidity." or "Reduce hold time beyond 30 minutes unless structure remains clean." or "Avoid forcing trades after the first failed expansion."
+Based on this trading data, generate exactly 4 5 specific, actionable recommendations for the next trading period. Each should be a concrete behavior change or reinforcement   not vague advice. Write in imperative form. Examples: "Continue prioritizing Inside Job setups at HTF liquidity." or "Reduce hold time beyond 30 minutes unless structure remains clean." or "Avoid forcing trades after the first failed expansion."
 
 Return ONLY a numbered list: 1. 2. 3. etc. No preamble, no headers, no markdown.`
         }]
@@ -2276,7 +2330,7 @@ Return ONLY a numbered list: 1. 2. 3. etc. No preamble, no headers, no markdown.
     const d = await res.json();
     const text = (d.content||[]).map(c=>c.text||'').join('').trim();
     if (!text || text.length < 10) throw new Error('empty');
-    const lines = text.split('\n').map(l=>l.trim()).filter(l=>l.match(/^\d+\.|^[•\-]/)).map(l=>l.replace(/^\d+\.\s*/,'').replace(/^[•\-]\s*/,''));
+    const lines = text.split('\n').map(l=>l.trim()).filter(l=>l.match(/^\d+\.|^[ \-]/)).map(l=>l.replace(/^\d+\.\s*/,'').replace(/^[ \-]\s*/,''));
     el.innerHTML = `<ul class="cr-action-list">${lines.map((l,i)=>`<li class="cr-action-item"><span class="cr-action-num">${i+1}</span><span class="cr-action-text">${l}</span></li>`).join('')}</ul>`;
   } catch(e) {
     el.innerHTML = `<div style="font-size:11px;color:var(--txt3)">Crew Analyst unavailable. Unable to access intelligence engine.</div>`;
@@ -2300,8 +2354,8 @@ function openPidModal(pid){
   const sampleScore=Math.min(total/20,1);
   const confidence=Math.round(wr*0.7+sampleScore*30);
   const stars=Math.round(confidence/20);
-  const starStr='★'.repeat(stars)+'☆'.repeat(5-stars);
-  const grade=confidence>=80?'A':confidence>=65?'B':confidence>=50?'C':confidence>=35?'D':'—';
+  const starStr=' '.repeat(stars)+' '.repeat(5-stars);
+  const grade=confidence>=80?'A':confidence>=65?'B':confidence>=50?'C':confidence>=35?'D':' ';
 
   // Distributions
   const finishes={},behaviors={},trigWR={};
@@ -2351,8 +2405,8 @@ function openPidModal(pid){
 
   // Pattern age
   const allDates=matched.map(e=>e.date).sort();
-  const firstSeen=allDates[0]?new Date(allDates[0]+'T12:00:00').toLocaleDateString('en-US',{month:'short',year:'numeric'}):'—';
-  const latestSeen=allDates[allDates.length-1]?new Date(allDates[allDates.length-1]+'T12:00:00').toLocaleDateString('en-US',{month:'short',year:'numeric'}):'—';
+  const firstSeen=allDates[0]?new Date(allDates[0]+'T12:00:00').toLocaleDateString('en-US',{month:'short',year:'numeric'}):' ';
+  const latestSeen=allDates[allDates.length-1]?new Date(allDates[allDates.length-1]+'T12:00:00').toLocaleDateString('en-US',{month:'short',year:'numeric'}):' ';
 
   // Distribution rows
   function distRows(obj){
@@ -2361,11 +2415,11 @@ function openPidModal(pid){
       <div class="pid-exp-row">
         <div class="pid-exp-pct">${Math.round(v/t*100)}%</div>
         <div style="flex:1"><div class="pid-exp-lbl">${k}</div><div class="pid-exp-bar"><div class="pid-exp-fill" style="width:${Math.round(v/t*100)}%"></div></div></div>
-        <div style="font-size:10px;color:var(--txt3);margin-left:8px">${v}×</div>
+        <div style="font-size:10px;color:var(--txt3);margin-left:8px">${v} </div>
       </div>`).join('');
   }
 
-  // PID abbreviation decode — used for tappable tooltips on the header
+  // PID abbreviation decode   used for tappable tooltips on the header
   const PID_DECODE={
     'ORL':'Opening Range Low','ORH':'Opening Range High','PDH':'Prev Day High','PDL':'Prev Day Low',
     'ONH':'Overnight High','ONL':'Overnight Low','PWH':'Prev Week High','PWL':'Prev Week Low',
@@ -2386,7 +2440,7 @@ function openPidModal(pid){
   const lastDates=sortedEntries.slice(0,6).map((e,i)=>{
     const dt=new Date(e.date+'T12:00:00');
     const fmt=dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    return `<div class="pid-last-date${i===0?' newest':''}">${i===0?'<span class="pid-last-star">★</span> ':''} ${fmt}</div>`;
+    return `<div class="pid-last-date${i===0?' newest':''}">${i===0?'<span class="pid-last-star"> </span> ':''} ${fmt}</div>`;
   }).join('');
 
   const recentsHTML=sortedEntries.slice(0,5).map(e=>{
@@ -2400,11 +2454,11 @@ function openPidModal(pid){
         <div class="pid-recent-date">${fmt}</div>
         <div class="pid-recent-pid" onclick="event.stopPropagation();openPidModal('${ePid}')" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">${ePid}</div>
       </div>
-      <span class="pid-outcome-pill ${pillClass}">${(outcome||'—').toUpperCase()}</span>
+      <span class="pid-outcome-pill ${pillClass}">${(outcome||' ').toUpperCase()}</span>
     </div>`;
   }).join('');
 
-  // Crew Intelligence Brief — dynamic, behavior-focused, analyst language throughout
+  // Crew Intelligence Brief   dynamic, behavior-focused, analyst language throughout
   const topFinishName = topFinish ? topFinish[0] : '';
   const topFinishPct  = topFinish && total ? Math.round(topFinish[1]/total*100) : 0;
   const trigPhrase    = bestTrig ? `Following a ${bestTrig.k}` : '';
@@ -2415,7 +2469,7 @@ function openPidModal(pid){
   } else if(wr >= 58){
     briefLine1 = `Historically resolved ${topFinishName||'as expected'} in ${topFinishPct}% of ${total} observed session${total!==1?'s':''}. Confirmation is still required before commitment.`;
   } else if(wr >= 42){
-    briefLine1 = `Mixed behavior across ${total} session${total!==1?'s':''}. ${topFinishPct}% resolved ${topFinishName||'as expected'} — no strong directional tendency identified. Additional confluence required.`;
+    briefLine1 = `Mixed behavior across ${total} session${total!==1?'s':''}. ${topFinishPct}% resolved ${topFinishName||'as expected'}   no strong directional tendency identified. Additional confluence required.`;
   } else {
     briefLine1 = `No consistent directional tendency identified across ${total} session${total!==1?'s':''}. Additional observations required.`;
   }
@@ -2425,12 +2479,12 @@ function openPidModal(pid){
     : topFailTrig
     ? `Most failures are preceded by ${topFailTrig[0]} as the entry trigger.`
     : total < 5
-    ? `Insufficient data to identify a failure pattern — continue logging sessions.`
+    ? `Insufficient data to identify a failure pattern   continue logging sessions.`
     : '';
 
   idEl.innerHTML=pidTappable;
   idEl.onclick=()=>copyPid(pid);
-  subEl.textContent='Case File · tap to copy';
+  subEl.textContent='Case File   tap to copy';
 
   // Build structured data context for Crew Analyst adaptive summary (used when total >= 8)
   const briefContext = {
@@ -2446,7 +2500,7 @@ function openPidModal(pid){
       <div class="pid-case-summary-lbl">Crew Intelligence Brief</div>
       ${total >= 8
         ? `<div class="pid-brief-ai" id="pid-brief-ai">
-             <span class="pid-brief-loading">Searching pattern archive…</span>
+             <span class="pid-brief-loading">Searching pattern archive </span>
            </div>`
         : `<div class="pid-case-summary-line">${briefLine1}</div>
            ${briefLine2?`<div class="pid-case-summary-line">${briefLine2}</div>`:''}`
@@ -2456,7 +2510,7 @@ function openPidModal(pid){
 
   idEl.innerHTML=pidTappable;
   idEl.onclick=()=>copyPid(pid);
-  subEl.textContent='Case File · tap to copy';
+  subEl.textContent='Case File   tap to copy';
 
   bodyEl.innerHTML=`
 
@@ -2467,7 +2521,7 @@ function openPidModal(pid){
     </div>
 
     <div class="pid-cf-section">
-      <div class="pid-cf-lbl">Expectation — What usually happens?</div>
+      <div class="pid-cf-lbl">Expectation   What usually happens?</div>
       ${Object.keys(finishes).length
         ? `<div class="pid-dist-sublbl">Expected Finish</div>${distRows(finishes)}`
         : '<div style="font-size:11px;color:var(--txt3)">Not enough data yet.</div>'}
@@ -2479,20 +2533,20 @@ function openPidModal(pid){
            <div class="pid-intel-line">${bestTrig.k}<span class="pid-intel-stat">${bestTrig.wr}% win rate</span></div>`
         : ''}
       ${worstTrig&&worstTrig.k!==bestTrig?.k
-        ? `<div class="pid-dist-sublbl" style="margin-top:10px">⚠ Watch For</div>
-           <div class="pid-intel-line warn">${worstTrig.k}<span class="pid-intel-stat">${worstTrig.wr}% win rate — historically underperforms</span></div>`
+        ? `<div class="pid-dist-sublbl" style="margin-top:10px">  Watch For</div>
+           <div class="pid-intel-line warn">${worstTrig.k}<span class="pid-intel-stat">${worstTrig.wr}% win rate   historically underperforms</span></div>`
         : ''}
     </div>
 
     ${typPathSteps.length>=2?`
     <div class="pid-cf-section">
-      <div class="pid-cf-lbl">Typical Path — How does it unfold?</div>
-      <div class="pid-path-inline">${typPathSteps.join(' → ')}</div>
+      <div class="pid-cf-lbl">Typical Path   How does it unfold?</div>
+      <div class="pid-path-inline">${typPathSteps.join('   ')}</div>
       <div class="pid-path-pct">Observed in ${typPct}% of occurrences</div>
     </div>`:''}
 
     <div class="pid-cf-section">
-      <div class="pid-cf-lbl">Reliability — Can I trust it?</div>
+      <div class="pid-cf-lbl">Reliability   Can I trust it?</div>
       <div class="pid-conf">
         <div class="pid-conf-stars">${starStr}</div>
         <div class="pid-conf-metrics">
@@ -2501,7 +2555,7 @@ function openPidModal(pid){
             <span class="pid-conf-metric-val" style="color:var(--gold)">${confidence}%</span>
           </div>
           <div class="pid-conf-row">
-            <span class="pid-conf-metric-lbl pid-edge-tip" title="Win Rate minus 50% baseline — measures how much this pattern outperforms a coin flip">Statistical Edge ⓘ</span>
+            <span class="pid-conf-metric-lbl pid-edge-tip" title="Win Rate minus 50% baseline   measures how much this pattern outperforms a coin flip">Statistical Edge  </span>
             <span class="pid-conf-metric-val ${edge>=0?'pos':'neg'}">${edgeStr}</span>
           </div>
           <div class="pid-conf-row">
@@ -2513,7 +2567,7 @@ function openPidModal(pid){
     </div>
 
     <div class="pid-cf-section">
-      <div class="pid-cf-lbl">Performance — How often has it worked?</div>
+      <div class="pid-cf-lbl">Performance   How often has it worked?</div>
       <div class="pid-modal-stats">
         <div class="pid-ms"><div class="pid-ms-num">${total}</div><div class="pid-ms-lbl">Occurrences</div></div>
         <div class="pid-ms"><div class="pid-ms-num">${wr}%</div><div class="pid-ms-lbl">Win Rate</div></div>
@@ -2524,7 +2578,7 @@ function openPidModal(pid){
 
     ${topFailure||topFailTrig?`
     <div class="pid-cf-section">
-      <div class="pid-cf-lbl">Failure Pattern — What breaks it?</div>
+      <div class="pid-cf-lbl">Failure Pattern   What breaks it?</div>
       <div class="pid-failure">
         ${topFailTrig?`<div class="pid-failure-trigger">Most Common Failure Trigger</div>
           <div class="pid-failure-close">${topFailTrig[0]}</div>
@@ -2541,7 +2595,7 @@ function openPidModal(pid){
       <div class="pid-age-row">
         <div class="pid-age-item"><div class="pid-age-lbl">First Seen</div><div class="pid-age-val">${firstSeen}</div></div>
         <div class="pid-age-item"><div class="pid-age-lbl">Most Recent</div><div class="pid-age-val">${latestSeen}</div></div>
-        <div class="pid-age-item"><div class="pid-age-lbl">Occurrences</div><div class="pid-age-val">${total}×</div></div>
+        <div class="pid-age-item"><div class="pid-age-lbl">Occurrences</div><div class="pid-age-val">${total} </div></div>
       </div>
       <div class="pid-dist-sublbl" style="margin-top:14px">Last Seen</div>
       <div class="pid-last-seen">${lastDates}</div>
@@ -2553,7 +2607,7 @@ function openPidModal(pid){
   overlay.classList.add('open');
   document.body.style.overflow='hidden';
 
-  // Adaptive Crew Analyst brief — fires when sufficient data exists
+  // Adaptive Crew Analyst brief   fires when sufficient data exists
   if(total >= 8){
     const aiEl = document.getElementById('pid-brief-ai');
     if(aiEl){
@@ -2583,7 +2637,7 @@ function openPidModal(pid){
         : total >= 5  ? 'Possible relationship observed'
         : 'Insufficient data';
 
-      const prompt = `You are the Crew Analyst for a professional futures scalping journal (YM/NQ micro futures, NY session 6:30–8 AM PST). Your role is to discover relationships in trading data — not summarize statistics.
+      const prompt = `You are the Crew Analyst for a professional futures scalping journal (YM/NQ micro futures, NY session 6:30 8 AM PST). Your role is to discover relationships in trading data   not summarize statistics.
 
 PATTERN: ${briefContext.pid}
 SESSIONS: ${briefContext.total}
@@ -2605,10 +2659,10 @@ PRIORITIZE these as potential filters:
 
 RULES:
 - Only report relationships where winning and losing sessions differ meaningfully
-- Do NOT infer from fewer than 5 occurrences — state "insufficient data"
+- Do NOT infer from fewer than 5 occurrences   state "insufficient data"
 - If a variable appears equally in wins and losses, note it is NOT a predictor
 - If you find a filter combination that changes expectation dramatically, report it
-- Never say "win rate" — use behavioral language ("resolved Near High", "finished as expected")
+- Never say "win rate"   use behavioral language ("resolved Near High", "finished as expected")
 - No preamble, no markdown, no bullet points
 
 Respond ONLY with valid JSON, no other text:
@@ -2646,25 +2700,25 @@ Use empty string for any section with no meaningful finding.`;
         // Timestamp for discoveries
         const lastUpdated = sortedEntries[0]
           ? new Date(sortedEntries[0].date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
-          : '—';
+          : ' ';
 
         const scorecard = `<div class="pid-scorecard">
           <div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Overall Bias</span><span class="pid-scorecard-val ${biasColor}">${biasDir}</span></div>
-          <div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Pattern Confidence</span><span class="pid-scorecard-val ${scorecardConfColor}">${confidence}% · ${scorecardConf}</span></div>
-          <div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Expected Finish</span><span class="pid-scorecard-val gold">${topFinishName||'—'} (${topFinishPct}%)</span></div>
+          <div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Pattern Confidence</span><span class="pid-scorecard-val ${scorecardConfColor}">${confidence}%   ${scorecardConf}</span></div>
+          <div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Expected Finish</span><span class="pid-scorecard-val gold">${topFinishName||' '} (${topFinishPct}%)</span></div>
           ${bestTrig?`<div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Expected Entry</span><span class="pid-scorecard-val">${bestTrig.k}</span></div>`:''}
           ${topFailTrig?`<div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Risk Trigger</span><span class="pid-scorecard-val red">${topFailTrig[0]}</span></div>`:''}
           <div class="pid-scorecard-row"><span class="pid-scorecard-lbl">Sample Size</span><span class="pid-scorecard-val">${total} Sessions</span></div>
         </div>`;
 
-        // Findings — clean, no timestamps
+        // Findings   clean, no timestamps
         let html = scorecard;
 
         if(findings.primary?.finding){
           html+=`<div class="pid-finding pid-finding-high">
             <div class="pid-finding-conf">Primary Observation</div>
             <div class="pid-finding-text">${findings.primary.finding}</div>
-            <div class="pid-finding-meta">Evidence Quality · ${findings.primary.confidence} &nbsp;·&nbsp; n = ${total}</div>
+            <div class="pid-finding-meta">Evidence Quality   ${findings.primary.confidence} &nbsp; &nbsp; n = ${total}</div>
           </div>`;
           const sentences=findings.primary.finding.match(/[^.!?]+[.!?]+/g)||[];
           const interpretation=sentences.length>1?sentences.slice(1).join(' ').trim():'';
@@ -2681,15 +2735,15 @@ Use empty string for any section with no meaningful finding.`;
           html+=`<div class="pid-finding pid-finding-mid">
             <div class="pid-finding-conf">Supporting Observation</div>
             <div class="pid-finding-text">${findings.secondary.finding}</div>
-            <div class="pid-finding-meta">Evidence Quality · ${findings.secondary.confidence||'Moderate'} &nbsp;·&nbsp; n = ${total}</div>
+            <div class="pid-finding-meta">Evidence Quality   ${findings.secondary.confidence||'Moderate'} &nbsp; &nbsp; n = ${total}</div>
           </div>`;
           supporting++;
         }
         if(findings.weak?.finding && supporting<2){
           html+=`<div class="pid-finding pid-finding-low">
-            <div class="pid-finding-conf">Supporting Observation · Low Confidence</div>
+            <div class="pid-finding-conf">Supporting Observation   Low Confidence</div>
             <div class="pid-finding-text">${findings.weak.finding}</div>
-            <div class="pid-finding-meta">Evidence Quality · Low &nbsp;·&nbsp; n = ${total}</div>
+            <div class="pid-finding-meta">Evidence Quality   Low &nbsp; &nbsp; n = ${total}</div>
           </div>`;
           supporting++;
         }
@@ -2715,7 +2769,7 @@ Use empty string for any section with no meaningful finding.`;
             } else {
               outcomeHTML=`<div class="pid-combo-lbl" style="margin-top:8px">Observed:</div><div class="pid-combo-outcome">${outcome}</div>`;
             }
-            conditionsHTML=`<div class="pid-combo-lbl">When:</div>${conditions.map(c=>`<div class="pid-combo-condition">· ${c}</div>`).join('')}`;
+            conditionsHTML=`<div class="pid-combo-lbl">When:</div>${conditions.map(c=>`<div class="pid-combo-condition">  ${c}</div>`).join('')}`;
           } else {
             conditionsHTML=`<div class="pid-finding-text">${comboText}</div>`;
           }
