@@ -2316,7 +2316,7 @@ Return ONLY the insights as a plain bulleted list using * as the bullet. No prea
     const text = (d.content||[]).map(c=>c.text||'').join('').trim();
     if (!text || text.length < 10) throw new Error('empty');
     const lines = text.split('\n').map(l=>l.trim()).filter(l=>l.startsWith(' ')||l.startsWith('-')||l.length>10);
-    el.innerHTML = `<div class="cr-analyst-byline">Based on the previous ${data.length} operation${data.length===1?'':'s'} </div><div class="cr-ai-text">${lines.map(l=>`<p>${l.replace(/^[ \-]\s*/,'')}</p>`).join('')}</div>`;
+    el.innerHTML = '<div class="cr-analyst-byline">Based on the previous '+data.length+' operation'+(data.length===1?'':'s')+'</div><div class="cr-ai-text">'+lines.map(l=>'<p>'+l.replace(/^[ \-]\s*/,'')+'</p>').join('')+'</div>';
   } catch(e) {
     el.innerHTML = `<div style="font-size:11px;color:var(--txt3)">Crew Analyst unavailable. Unable to access intelligence engine.</div>`;
   }
@@ -2347,7 +2347,7 @@ Return ONLY a numbered list: 1. 2. 3. etc. No preamble, no headers, no markdown.
     const text = (d.content||[]).map(c=>c.text||'').join('').trim();
     if (!text || text.length < 10) throw new Error('empty');
     const lines = text.split('\n').map(l=>l.trim()).filter(l=>l.match(/^\d+\.|^[ \-]/)).map(l=>l.replace(/^\d+\.\s*/,'').replace(/^[ \-]\s*/,''));
-    el.innerHTML = `<ul class="cr-action-list">${lines.map((l,i)=>`<li class="cr-action-item"><span class="cr-action-num">${i+1}</span><span class="cr-action-text">${l}</span></li>`).join('')}</ul>`;
+    el.innerHTML = '<ul class="cr-action-list">'+lines.map((l,i)=>'<li class="cr-action-item"><span class="cr-action-num">'+(i+1)+'</span><span class="cr-action-text">'+l+'</span></li>').join('')+'</ul>';
   } catch(e) {
     el.innerHTML = `<div style="font-size:11px;color:var(--txt3)">Crew Analyst unavailable. Unable to access intelligence engine.</div>`;
   }
@@ -2519,7 +2519,7 @@ function openPidModal(pid){
              <span class="pid-brief-loading">Searching pattern archive </span>
            </div>`
         : `<div class="pid-case-summary-line">${briefLine1}</div>
-           ${briefLine2?`<div class="pid-case-summary-line">${briefLine2}</div>`:''}`
+           ${briefLine2?'<div class="pid-case-summary-line">'+briefLine2+'</div>':''}`
       }
     </div>
 
@@ -2533,7 +2533,7 @@ function openPidModal(pid){
     <div class="pid-case-summary">
       <div class="pid-case-summary-lbl">Crew Intelligence Brief</div>
       <div class="pid-case-summary-line">${briefLine1}</div>
-      ${briefLine2?`<div class="pid-case-summary-line">${briefLine2}</div>`:''}
+      ${briefLine2?'<div class="pid-case-summary-line">'+briefLine2+'</div>':''}
     </div>
 
     <div class="pid-cf-section">
@@ -2785,7 +2785,7 @@ Use empty string for any section with no meaningful finding.`;
             } else {
               outcomeHTML=`<div class="pid-combo-lbl" style="margin-top:8px">Observed:</div><div class="pid-combo-outcome">${outcome}</div>`;
             }
-            conditionsHTML=`<div class="pid-combo-lbl">When:</div>${conditions.map(c=>`<div class="pid-combo-condition">  ${c}</div>`).join('')}`;
+            conditionsHTML='<div class="pid-combo-lbl">When:</div>'+conditions.map(c=>'<div class="pid-combo-condition">  '+c+'</div>').join('');
           } else {
             conditionsHTML=`<div class="pid-finding-text">${comboText}</div>`;
           }
@@ -2796,8 +2796,7 @@ Use empty string for any section with no meaningful finding.`;
         }
         if(aiEl) aiEl.innerHTML=html||`${scorecard}<span class="pid-brief-loading">No significant relationships identified at this sample size.</span>`;
       }).catch(()=>{
-        if(aiEl) aiEl.innerHTML=`<span class="pid-case-summary-line">${briefLine1}</span>${briefLine2?`<span class="pid-case-summary-line" style="display:block;margin-top:5px">${briefLine2}</span>`:''}`;
-      });
+        if(aiEl) aiEl.innerHTML='<span class="pid-case-summary-line">'+briefLine1+'</span>'+(briefLine2?'<span class="pid-case-summary-line" style="display:block;margin-top:5px">'+briefLine2+'</span>':'');      });
     }
   }
 }
