@@ -1029,7 +1029,23 @@ let entries=[];
 
 try{entries=JSON.parse(localStorage.getItem('bhc_entries')||'[]')}catch(e){}
 
-function saveToLS(){try{localStorage.setItem('bhc_entries',JSON.stringify(entries.map(e=>{const c=JSON.parse(JSON.stringify(e));ATTACH_SECTIONS.forEach(k=>{if(c.attach&&c.attach[k])c.attach[k]=c.attach[k].map(a=>{return{name:a.name}});});return c;}))).catch?localStorage.setItem('bhc_entries','[]'):null;localStorage.setItem('bhc_entries',JSON.stringify(entries.map(e=>{const c=Object.assign({},e);c.attach={};return c;})));}catch(ex){}}
+function saveToLS(){
+  try{
+    const clean=entries.map(e=>{
+      const c=JSON.parse(JSON.stringify(e));
+      // Strip base64 image data from attachments to keep size manageable
+      if(c.attach){
+        Object.keys(c.attach).forEach(k=>{
+          if(Array.isArray(c.attach[k])){
+            c.attach[k]=c.attach[k].map(a=>({name:a.name}));
+          }
+        });
+      }
+      return c;
+    });
+    localStorage.setItem('bhc_entries',JSON.stringify(clean));
+  }catch(ex){}
+}
 
 function switchMkt(i){
   saveMktState();
