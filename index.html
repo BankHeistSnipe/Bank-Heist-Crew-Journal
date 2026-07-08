@@ -1485,7 +1485,7 @@ function renderPatterns(){
   }
   const n=entries.length;
 
-  // Highest Probability Sequence — build full blueprint from most common values
+  // Highest Probability Sequence - build full blueprint from most common values
   function topVal(field){const f=freq(field);return f.length?f[0][0]:'';}
   const seqLevel  = topVal('strongest-lvl');
   const seqTrig   = topVal('best-trigger');
